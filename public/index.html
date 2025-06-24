@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎤 Live Transcription</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            background: #0f0f0f;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1.6;
+        }
+
+        .container {
+            background: #1a1a1a;
+            border: 1px solid #2d2d2d;
+            border-radius: 12px;
+            padding: 48px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            max-width: 900px;
+            width: 95%;
+            margin: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 1px solid #2d2d2d;
+            padding-bottom: 32px;
+        }
+
+        .header h1 {
+            font-size: 2.25rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #ffffff;
+            letter-spacing: -0.025em;
+        }
+
+        .header p {
+            color: #a1a1a1;
+            font-size: 1.125rem;
+            font-weight: 400;
+        }
+
+        .controls {
+            text-align: center;
+            margin-bottom: 40px;
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 16px 32px;
+            font-size: 1rem;
+            font-weight: 500;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            min-width: 180px;
+            font-family: inherit;
+        }
+
+        .start-btn {
+            background: #ffffff;
+            color: #0f0f0f;
+            border: 1px solid #d1d5db;
+        }
+
+        .start-btn:hover {
+            background: #f3f4f6;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(255, 255, 255, 0.15);
+        }
+
+        .stop-btn {
+            background: #0f0f0f;
+            color: #ffffff;
+            border: 1px solid #374151;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stop-btn:hover {
+            background: #1f2937;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .stop-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            animation: recording-shimmer 2s infinite;
+        }
+
+        .clear-btn {
+            background: transparent;
+            color: #6b7280;
+            border: 1px solid #374151;
+            min-width: 160px;
+        }
+
+        .clear-btn:hover {
+            background: #1f2937;
+            color: #9ca3af;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .clear-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .clear-btn:disabled:hover {
+            background: transparent;
+            color: #6b7280;
+        }
+
+        @keyframes recording-shimmer {
+            0% { left: -100%; }
+            50% { left: 100%; }
+            100% { left: 100%; }
+        }
+
+        .transcription-area {
+            background: #0f0f0f;
+            border: 1px solid #374151;
+            border-radius: 8px;
+            padding: 32px;
+            min-height: 350px;
+            font-size: 1.125rem;
+            line-height: 1.75;
+            color: #ffffff;
+            font-family: ui-monospace, SFMono-Regular, 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+        }
+
+        .transcript-line {
+            margin-bottom: 16px;
+            padding: 12px 0;
+            border-bottom: 1px solid #1f2937;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        .transcript-line:last-child {
+            border-bottom: none;
+        }
+
+        .interim-text {
+            color: #6b7280;
+            font-style: italic;
+            background: #111827;
+            padding: 12px 16px;
+            border-radius: 6px;
+            border-left: 3px solid #374151;
+            animation: pulse-text 1.5s infinite;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse-text {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+
+        .status {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 0.875rem;
+            color: #9ca3af;
+            font-weight: 500;
+        }
+
+        .recording-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #ffffff;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: recording-pulse 1s infinite;
+        }
+
+        @keyframes recording-pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+
+        .error {
+            background: #1f1f1f;
+            border: 1px solid #dc2626;
+            color: #fca5a5;
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 24px;
+            font-size: 0.875rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #6b7280;
+            margin-top: 80px;
+            font-size: 1rem;
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 32px 24px;
+                margin: 10px;
+            }
+            
+            .header h1 {
+                font-size: 1.875rem;
+            }
+            
+            .transcription-area {
+                font-size: 1rem;
+                padding: 24px;
+                min-height: 280px;
+            }
+
+                         .btn {
+                 min-width: 150px;
+                 padding: 14px 24px;
+             }
+
+             .controls {
+                 gap: 12px;
+             }
+
+             .clear-btn {
+                 min-width: 140px;
+             }
+        }
+
+        /* Scrollbar styling */
+        .transcription-area::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .transcription-area::-webkit-scrollbar-track {
+            background: #1f2937;
+            border-radius: 3px;
+        }
+
+        .transcription-area::-webkit-scrollbar-thumb {
+            background: #374151;
+            border-radius: 3px;
+        }
+
+        .transcription-area::-webkit-scrollbar-thumb:hover {
+            background: #4b5563;
+        }
+
+        .tips-section {
+            margin-top: 32px;
+            padding: 24px;
+            background: #111827;
+            border: 1px solid #374151;
+            border-radius: 8px;
+        }
+
+        .tips-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .tips-icon {
+            font-size: 1.2rem;
+            margin-right: 8px;
+        }
+
+        .tips-title {
+            font-size: 1rem;
+            font-weight: 500;
+            color: #d1d5db;
+            flex: 1;
+        }
+
+        .tips-toggle {
+            font-size: 0.875rem;
+            color: #6b7280;
+            transition: transform 0.2s ease;
+        }
+
+        .tips-toggle.expanded {
+            transform: rotate(180deg);
+        }
+
+        .tips-content {
+            display: none;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        .tips-content.show {
+            display: block;
+        }
+
+        .tips-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .tips-list li {
+            padding: 8px 0;
+            color: #9ca3af;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .tips-list li::before {
+            content: '💡';
+            margin-right: 8px;
+            margin-top: 1px;
+            font-size: 0.75rem;
+        }
+
+        .tips-divider {
+            height: 1px;
+            background: #374151;
+            margin: 12px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎤 Live Transcription</h1>
+            <p>Real-time Spanish voice transcription</p>
+        </div>
+
+        <div class="controls">
+            <button id="startBtn" class="btn start-btn">Start Transcribing</button>
+            <button id="stopBtn" class="btn stop-btn" style="display: none;">Stop Transcribing</button>
+            <button id="clearBtn" class="btn clear-btn" disabled>New Conversation</button>
+        </div>
+
+        <div class="transcription-area" id="transcriptionArea">
+            <div class="empty-state">
+                <div class="empty-state-icon">🎤</div>
+                <div>Click "Start Transcribing" to begin transcription...</div>
+            </div>
+        </div>
+
+        <div class="status" id="status"></div>
+        <div id="error" class="error" style="display: none;"></div>
+
+        <div class="tips-section">
+            <div class="tips-header" onclick="toggleTips()">
+                <span class="tips-icon">💡</span>
+                <span class="tips-title">Tips for Better Transcription</span>
+                <span class="tips-toggle" id="tipsToggle">▼</span>
+            </div>
+            <div class="tips-content" id="tipsContent">
+                <ul class="tips-list">
+                    <li>Keep your microphone close to your mouth (6-12 inches away)</li>
+                    <li>Speak loudly and clearly at a steady pace</li>
+                    <li>Minimize background noise when possible</li>
+                    <li>Take brief pauses before a new person begins speaking</li>
+                    <li>Avoid overlapping speech for better accuracy</li>
+                    <li>Use Chrome browser for best audio support</li>
+                </ul>
+                <div class="tips-divider"></div>
+                <div style="color: #6b7280; font-size: 0.75rem; text-align: center;">
+                    Click the tips header to show/hide this section
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const transcriptionArea = document.getElementById('transcriptionArea');
+        const status = document.getElementById('status');
+        const errorDiv = document.getElementById('error');
+
+        let mediaRecorder;
+        let isRecording = false;
+        let finalTranscript = '';
+
+        // Check browser support
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            showError('Your browser does not support audio transcription. Please use Chrome, Firefox, or Safari.');
+        }
+
+        startBtn.addEventListener('click', startRecording);
+        stopBtn.addEventListener('click', stopRecording);
+        clearBtn.addEventListener('click', clearConversation);
+
+        socket.on('transcription', (data) => {
+            if (data.isFinal) {
+                // Add final transcript
+                finalTranscript += data.text + '\n';
+                updateDisplay();
+                updateClearButton();
+            } else {
+                // Show interim result
+                updateDisplay(data.text);
+            }
+        });
+
+        socket.on('error', (error) => {
+            showError('Transcription error: ' + error);
+        });
+
+        async function startRecording() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    audio: {
+                        sampleRate: 48000,
+                        channelCount: 1,
+                        echoCancellation: true,
+                        noiseSuppression: true
+                    } 
+                });
+
+                mediaRecorder = new MediaRecorder(stream, {
+                    mimeType: 'audio/webm;codecs=opus'
+                });
+
+                mediaRecorder.ondataavailable = (event) => {
+                    if (event.data.size > 0) {
+                        event.data.arrayBuffer().then((buffer) => {
+                            socket.emit('audio-data', buffer);
+                        });
+                    }
+                };
+
+                mediaRecorder.start(100); // Send data every 100ms
+                socket.emit('start-recording');
+
+                isRecording = true;
+                startBtn.style.display = 'none';
+                stopBtn.style.display = 'inline-block';
+                updateDisplay(); // Update display to show listening state
+                status.innerHTML = '<span class="recording-indicator"></span>Transcribing... Speak now!';
+                hideError();
+
+            } catch (error) {
+                console.error('Error starting transcription:', error);
+                showError('Could not access microphone. Please check permissions and try again.');
+            }
+        }
+
+        function stopRecording() {
+            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                mediaRecorder.stop();
+                mediaRecorder.stream.getTracks().forEach(track => track.stop());
+            }
+            
+            socket.emit('stop-recording');
+            
+            isRecording = false;
+            startBtn.style.display = 'inline-block';
+            stopBtn.style.display = 'none';
+            updateDisplay(); // Update display to show correct state
+            status.textContent = 'Transcription stopped.';
+        }
+
+        function updateDisplay(interimText = '') {
+            if (!finalTranscript && !interimText) {
+                // Show different states based on whether we're recording or not
+                if (isRecording) {
+                    transcriptionArea.innerHTML = '<div class="empty-state"><div class="empty-state-icon">👂</div><div>Listening for speech...</div></div>';
+                } else {
+                    transcriptionArea.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🎤</div><div>Click "Start Transcribing" to begin transcription...</div></div>';
+                }
+                return;
+            }
+
+            let html = '';
+            
+            // Add final transcript lines
+            if (finalTranscript) {
+                const lines = finalTranscript.trim().split('\n').filter(line => line.trim());
+                lines.forEach(line => {
+                    html += `<div class="transcript-line">${escapeHtml(line.trim())}</div>`;
+                });
+            }
+            
+            // Add interim text
+            if (interimText) {
+                html += `<div class="interim-text">${escapeHtml(interimText)}</div>`;
+            }
+            
+            transcriptionArea.innerHTML = html;
+            transcriptionArea.scrollTop = transcriptionArea.scrollHeight;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function showError(message) {
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+
+        function hideError() {
+            errorDiv.style.display = 'none';
+        }
+
+        function clearConversation() {
+            finalTranscript = '';
+            updateDisplay();
+            updateClearButton();
+            status.textContent = 'Conversation cleared. Ready to start transcribing.';
+        }
+
+        function updateClearButton() {
+            clearBtn.disabled = !finalTranscript.trim();
+        }
+
+        // Initialize clear button state
+        updateClearButton();
+
+        // Tips toggle functionality
+        function toggleTips() {
+            const tipsContent = document.getElementById('tipsContent');
+            const tipsToggle = document.getElementById('tipsToggle');
+            
+            if (tipsContent.classList.contains('show')) {
+                tipsContent.classList.remove('show');
+                tipsToggle.classList.remove('expanded');
+            } else {
+                tipsContent.classList.add('show');
+                tipsToggle.classList.add('expanded');
+            }
+        }
+
+        // Handle page unload
+        window.addEventListener('beforeunload', () => {
+            if (isRecording) {
+                stopRecording();
+            }
+        });
+    </script>
+</body>
+</html> 
