@@ -1338,6 +1338,21 @@
             showError('Your browser does not support audio transcription. Please use Chrome, Firefox, or Safari.');
         }
 
+        // Detect PWA mode and add identifier for server
+        const isPWAMode = window.matchMedia('(display-mode: standalone)').matches || 
+                         window.navigator.standalone || 
+                         document.referrer.includes('android-app://');
+        
+        if (isPWAMode) {
+            console.log('🔍 Running in PWA mode');
+            // Add PWA identifier to current URL if not already present
+            if (!window.location.search.includes('pwa=true')) {
+                const url = new URL(window.location);
+                url.searchParams.set('pwa', 'true');
+                window.history.replaceState({}, '', url);
+            }
+        }
+
         // Initialize Socket.io connection
         socket = io();
         
@@ -1355,11 +1370,28 @@
             }
         });
 
-        socket.on('connect_error', () => {
-            console.log('Failed to connect to server');
+        socket.on('connect_error', (error) => {
+            console.log('Failed to connect to server:', error);
             if (navigator.onLine) {
                 showError('Cannot connect to transcription server. Please try again.');
             }
+        });
+        
+        // Additional debugging for PWA issues
+        window.addEventListener('load', () => {
+            console.log('🔍 App loaded successfully');
+            console.log('📱 PWA Mode:', isPWAMode);
+            console.log('🌐 Online:', navigator.onLine);
+            console.log('🔌 Socket connected:', socket.connected);
+            
+            // Check if page content is visible
+            setTimeout(() => {
+                const transcriptionArea = document.getElementById('transcriptionArea');
+                if (transcriptionArea && transcriptionArea.offsetHeight === 0) {
+                    console.warn('⚠️ Main content area not visible - possible blank screen issue');
+                    showError('App failed to load properly. Please refresh the page.');
+                }
+            }, 1000);
         });
         
         socket.on('transcript', (data) => {

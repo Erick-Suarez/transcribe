@@ -35,6 +35,27 @@ function requireAuth(req, res, next) {
         return next();
     }
     
+    // Check if request is from PWA (standalone mode)
+    // PWA detection: check for display-mode or user-agent headers
+    const isPWA = req.headers['sec-fetch-site'] === 'same-origin' && 
+                  req.headers['sec-fetch-mode'] === 'navigate' && 
+                  req.headers['sec-fetch-dest'] === 'document' &&
+                  (req.headers['user-agent']?.includes('Mobile') || 
+                   req.headers['user-agent']?.includes('wv') ||
+                   req.query.pwa === 'true');
+    
+    // Also check for standalone display mode indicator
+    const isStandalone = req.headers['accept']?.includes('text/html') && 
+                        req.headers['sec-fetch-dest'] === 'document' &&
+                        !req.headers['sec-fetch-site'];
+    
+    if (isPWA || isStandalone) {
+        console.log('🔓 PWA detected - bypassing authentication');
+        req.session.authenticated = true;
+        req.session.pwaAccess = true;
+        return next();
+    }
+    
     // If not authenticated, try basic auth
     basicAuth({
         users: { 'user': process.env.AUTH_PASSWORD },
@@ -57,6 +78,7 @@ function requireAuth(req, res, next) {
 
 if (isProduction && process.env.AUTH_PASSWORD) {
     console.log('🔒 Session-based authentication enabled for production');
+    console.log('🔓 PWA users will bypass authentication automatically');
     
     // Skip authentication for icon files and manifest
     app.use((req, res, next) => {
