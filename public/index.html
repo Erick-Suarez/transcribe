@@ -16,6 +16,11 @@
     <!-- PWA Manifest -->
     <link rel="manifest" href="/manifest.json">
     
+    <!-- Material Symbols Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+    
     <!-- Preload icon for iOS -->
     <link rel="preload" href="/apple-touch-icon.png?t=1735163400" as="image" type="image/png">
     
@@ -30,6 +35,14 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings:
+            'FILL' 0,
+            'wght' 400,
+            'GRAD' 0,
+            'opsz' 24
         }
 
         body {
@@ -70,6 +83,18 @@
             gap: 12px;
             position: relative;
             z-index: 100;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
         .dropdowns-group {
@@ -653,6 +678,226 @@
             font-size: 14px;
             line-height: 1.5;
         }
+
+        /* Settings Modal Styles */
+        .settings-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .settings-modal.show {
+            display: flex;
+        }
+
+        .settings-content {
+            background: #1a1a1a;
+            border: 1px solid #2d2d2d;
+            border-radius: 12px;
+            padding: 32px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .settings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            border-bottom: 1px solid #2d2d2d;
+            padding-bottom: 16px;
+        }
+
+        .settings-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .settings-close {
+            background: none;
+            border: none;
+            color: #9ca3af;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .settings-close:hover {
+            background: #2d2d2d;
+            color: #ffffff;
+        }
+
+        .settings-section {
+            margin-bottom: 24px;
+        }
+
+        .settings-label {
+            font-size: 16px;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 8px;
+        }
+
+        .settings-description {
+            font-size: 14px;
+            color: #9ca3af;
+            margin-bottom: 16px;
+        }
+
+        .settings-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .settings-option {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            background: #2d2d2d;
+            border: 1px solid #404040;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .settings-option:hover {
+            background: #353535;
+            border-color: #525252;
+        }
+
+        .settings-option-radio {
+            margin-right: 16px;
+            position: relative;
+        }
+
+        .settings-option-radio input[type="radio"] {
+            opacity: 0;
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            margin: 0;
+            cursor: pointer;
+        }
+
+        .settings-option-radio label {
+            display: block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #6b7280;
+            border-radius: 50%;
+            background: transparent;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+
+        .settings-option-radio input[type="radio"]:checked + label {
+            border-color: #ffffff;
+            background: #ffffff;
+        }
+
+        .settings-option-radio input[type="radio"]:checked + label::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #1a1a1a;
+        }
+
+        .settings-option-content {
+            flex: 1;
+        }
+
+        .settings-option-name {
+            font-size: 16px;
+            font-weight: 500;
+            color: #ffffff;
+            margin-bottom: 4px;
+        }
+
+        .settings-option-description {
+            font-size: 14px;
+            color: #9ca3af;
+        }
+
+        /* Text Size Controls */
+        .text-size-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: #2d2d2d;
+            border: 1px solid #404040;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .text-size-controls:hover {
+            background: #353535;
+            border-color: #525252;
+        }
+
+        .text-size-btn {
+            background: none;
+            border: none;
+            color: #9ca3af;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 24px;
+            min-height: 24px;
+            font-size: 16px;
+            font-weight: 500;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        .text-size-btn:hover {
+            background: #404040;
+            color: #ffffff;
+        }
+
+        .text-size-btn:active {
+            transform: scale(0.95);
+        }
+
+        .text-size-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .text-size-btn:disabled:hover {
+            background: none;
+            color: #9ca3af;
+        }
+
+        .text-size-icon {
+            font-size: 16px;
+            color: #9ca3af;
+        }
         
         .error {
             background: #1f1f1f;
@@ -740,6 +985,14 @@
                 gap: 8px;
             }
             
+            .header-left {
+                gap: 8px;
+            }
+            
+            .header-right {
+                gap: 8px;
+            }
+            
             .model-selector {
                 flex: 1;
                 max-width: none;
@@ -778,6 +1031,22 @@
                 white-space: nowrap;
                 overflow: hidden;
                 text-overflow: ellipsis;
+            }
+            
+            .text-size-controls {
+                padding: 6px 10px;
+                gap: 6px;
+            }
+            
+            .text-size-btn {
+                min-width: 20px;
+                min-height: 20px;
+                font-size: 14px;
+                padding: 2px 4px;
+            }
+            
+            .text-size-icon {
+                font-size: 14px;
             }
             
             .transcription-area {
@@ -861,28 +1130,11 @@
 <body>
     <div class="container">
         <div class="header">
-            <div class="dropdowns-group">
-                <div class="model-selector">
-                    <div class="custom-dropdown" id="customDropdown">
-                        <div class="dropdown-trigger" id="dropdownTrigger">
-                            <div class="current-service-name" id="currentServiceName">Google STT</div>
-                            <div class="dropdown-arrow">▼</div>
-                        </div>
-                        <div class="dropdown-content" id="dropdownContent">
-                            <div class="dropdown-option" data-value="auto">
-                                <div class="option-name">Auto-select Model</div>
-                                <div class="option-description">Best available service</div>
-                            </div>
-                            <div class="dropdown-option" data-value="deepgram">
-                                <div class="option-name">Deepgram</div>
-                                <div class="option-description">Fast real-time transcription</div>
-                            </div>
-                            <div class="dropdown-option" data-value="google">
-                                <div class="option-name">Google STT</div>
-                                <div class="option-description">Enhanced accuracy</div>
-                            </div>
-                        </div>
-                    </div>
+            <div class="header-left">
+                <div class="text-size-controls">
+                    <button class="text-size-btn" id="decreaseFontBtn">−</button>
+                    <span class="material-symbols-outlined text-size-icon">format_size</span>
+                    <button class="text-size-btn" id="increaseFontBtn">+</button>
                 </div>
                 <div class="language-selector">
                     <div class="language-dropdown" id="languageDropdown">
@@ -901,23 +1153,20 @@
                     </div>
                 </div>
             </div>
-            <button class="control-text-button" id="tipsBtn">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M9 21h6"/>
-                    <path d="M12 3a6 6 0 0 0-6 6v3a4 4 0 0 0 4 4h4a4 4 0 0 0 4-4V9a6 6 0 0 0-6-6Z"/>
-                </svg>
-            </button>
+            <div class="header-right">
+                <button class="control-text-button" id="settingsBtn">
+                    <span class="material-symbols-outlined">settings</span>
+                </button>
+                <button class="control-text-button" id="tipsBtn">
+                    <span class="material-symbols-outlined">lightbulb</span>
+                </button>
+            </div>
         </div>
         
         <div class="transcription-area" id="transcriptionArea">
             <div class="empty-state">
                 <div class="empty-state-icon">
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
-                        <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
-                        <path d="M12 19v4"/>
-                        <path d="M8 23h8"/>
-                    </svg>
+                    <span class="material-symbols-outlined" style="font-size: 32px;">mic</span>
                 </div>
                 <div>Tap to start recording...</div>
             </div>
@@ -928,36 +1177,17 @@
         <div class="bottom-section">
             <div class="controls-section">
                 <button class="control-text-button" id="clearBtn">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M18 6 6 18"/>
-                        <path d="m6 6 12 12"/>
-                    </svg>
+                    <span class="material-symbols-outlined">close</span>
                 </button>
                 <div class="center-controls">
                     <button class="control-button record-button" id="recordBtn">
-                        <span id="recordIcon">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M8 5v14l11-7z"/>
-                            </svg>
+                        <span id="recordIcon" class="material-symbols-outlined">
+                            play_arrow
                         </span>
                     </button>
                 </div>
                 <button class="control-text-button" id="rotationBtn">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
-                        <!-- Phone body as simple rectangle -->
-                        <rect x="8" y="6" width="8" height="12" rx="1" ry="1" stroke-width="1"/>
-                        
-                        <!-- Circular rotation arrows around the phone -->
-                        <!-- Top-right curved arrow (clockwise) -->
-                        <path d="M 12 3 A 6.5 6.5 0 0 1 19 10" stroke-width="1"/>
-                        <!-- Top arrow head pointing clockwise (larger and more prominent) -->
-                        <polygon points="17.5,8.5 20.5,10 17.5,11.5" fill="white" stroke="none"/>
-                        
-                        <!-- Bottom-left curved arrow (counter-clockwise) -->
-                        <path d="M 12 21 A 6.5 6.5 0 0 1 5 14" stroke-width="1"/>
-                        <!-- Bottom arrow head pointing counter-clockwise (larger and more prominent) -->
-                        <polygon points="6.5,13.5 3.5,14 6.5,15.5" fill="white" stroke="none"/>
-                    </svg>
+                    <span class="material-symbols-outlined">screen_rotation</span>
                 </button>
             </div>
         </div>
@@ -989,6 +1219,52 @@
             </div>
         </div>
 
+        <!-- Settings Modal -->
+        <div class="settings-modal" id="settingsModal">
+            <div class="settings-content">
+                <div class="settings-header">
+                    <div class="settings-title">⚙️ Settings</div>
+                    <button class="settings-close" id="settingsClose">×</button>
+                </div>
+                <div class="settings-section">
+                    <div class="settings-label">Transcription Model</div>
+                    <div class="settings-description">Choose the speech-to-text service for transcription</div>
+                    <div class="settings-options">
+                        <div class="settings-option" data-value="auto">
+                            <div class="settings-option-radio">
+                                <input type="radio" name="model" value="auto" id="model-auto">
+                                <label for="model-auto"></label>
+                            </div>
+                            <div class="settings-option-content">
+                                <div class="settings-option-name">Auto-select Model</div>
+                                <div class="settings-option-description">Best available service</div>
+                            </div>
+                        </div>
+                        <div class="settings-option" data-value="deepgram">
+                            <div class="settings-option-radio">
+                                <input type="radio" name="model" value="deepgram" id="model-deepgram">
+                                <label for="model-deepgram"></label>
+                            </div>
+                            <div class="settings-option-content">
+                                <div class="settings-option-name">Deepgram</div>
+                                <div class="settings-option-description">Fast real-time transcription</div>
+                            </div>
+                        </div>
+                        <div class="settings-option" data-value="google">
+                            <div class="settings-option-radio">
+                                <input type="radio" name="model" value="google" id="model-google" checked>
+                                <label for="model-google"></label>
+                            </div>
+                            <div class="settings-option-content">
+                                <div class="settings-option-name">Google STT</div>
+                                <div class="settings-option-description">Enhanced accuracy</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
@@ -999,9 +1275,9 @@
         const tipsBtn = document.getElementById('tipsBtn');
         const tipsModal = document.getElementById('tipsModal');
         const tipsClose = document.getElementById('tipsClose');
-        const dropdownTrigger = document.getElementById('dropdownTrigger');
-        const dropdownContent = document.getElementById('dropdownContent');
-        const currentServiceName = document.getElementById('currentServiceName');
+        const settingsBtn = document.getElementById('settingsBtn');
+        const settingsModal = document.getElementById('settingsModal');
+        const settingsClose = document.getElementById('settingsClose');
         const transcriptionArea = document.getElementById('transcriptionArea');
         const errorDiv = document.getElementById('error');
 
@@ -1010,6 +1286,8 @@
         const currentLanguageName = document.getElementById('currentLanguageName');
         const rotationBtn = document.getElementById('rotationBtn');
         const container = document.querySelector('.container');
+        const increaseFontBtn = document.getElementById('increaseFontBtn');
+        const decreaseFontBtn = document.getElementById('decreaseFontBtn');
         
         let isRecording = false;
         let mediaRecorder;
@@ -1020,6 +1298,9 @@
         let currentLanguage = 'es';
         let isOnline = navigator.onLine;
         let isRotated = false;
+        let currentFontSize = 16; // Default font size in pixels
+        const minFontSize = 12;
+        const maxFontSize = 24;
 
         // Network status functions
         function updateOnlineStatus() {
@@ -1111,14 +1392,27 @@
         clearBtn.addEventListener('click', clearConversation);
         tipsBtn.addEventListener('click', showTips);
         tipsClose.addEventListener('click', hideTips);
+        settingsBtn.addEventListener('click', showSettings);
+        settingsClose.addEventListener('click', hideSettings);
         
         // Screen rotation functionality
         rotationBtn.addEventListener('click', toggleScreenRotation);
+        
+        // Font size controls
+        increaseFontBtn.addEventListener('click', increaseFontSize);
+        decreaseFontBtn.addEventListener('click', decreaseFontSize);
         
         // Close tips modal when clicking outside
         tipsModal.addEventListener('click', (e) => {
             if (e.target === tipsModal) {
                 hideTips();
+            }
+        });
+        
+        // Close settings modal when clicking outside
+        settingsModal.addEventListener('click', (e) => {
+            if (e.target === settingsModal) {
+                hideSettings();
             }
         });
         
@@ -1294,7 +1588,7 @@
                 processor.connect(audioContext.destination);
                 
                 isRecording = true;
-                recordIcon.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
+                recordIcon.innerHTML = 'pause';
                 
                 updateDisplay();
                 hideError();
@@ -1315,7 +1609,7 @@
             socket.emit('stop-transcription');
             
             isRecording = false;
-            recordIcon.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+            recordIcon.innerHTML = 'play_arrow';
             
             updateDisplay();
         }
@@ -1331,7 +1625,7 @@
                 if (isRecording) {
                     transcriptionArea.innerHTML = '<div class="empty-state"><div class="empty-state-icon"><div class="audio-visualizer"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div></div><div>Listening for speech...</div></div>';
                 } else {
-                    transcriptionArea.innerHTML = '<div class="empty-state"><div class="empty-state-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><path d="M12 19v4"/><path d="M8 23h8"/></svg></div><div>Tap to start recording...</div></div>';
+                    transcriptionArea.innerHTML = '<div class="empty-state"><div class="empty-state-icon"><span class="material-symbols-outlined" style="font-size: 32px;">mic</span></div><div>Tap to start recording...</div></div>';
                 }
                 transcriptContainer = null;
                 interimElement = null;
@@ -1448,6 +1742,58 @@
             tipsModal.classList.remove('show');
         }
 
+        function showSettings() {
+            settingsModal.classList.add('show');
+        }
+        
+        function hideSettings() {
+            settingsModal.classList.remove('show');
+        }
+
+        // Settings functionality
+        function initializeSettings() {
+            // Add event listeners to radio buttons
+            const radioButtons = document.querySelectorAll('input[name="model"]');
+            radioButtons.forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    if (e.target.checked) {
+                        selectService(e.target.value);
+                        hideSettings();
+                    }
+                });
+            });
+            
+            // Add click listeners to the entire option containers
+            const settingsOptions = document.querySelectorAll('.settings-option');
+            settingsOptions.forEach(option => {
+                option.addEventListener('click', (e) => {
+                    const radio = option.querySelector('input[type="radio"]');
+                    if (radio && !radio.checked) {
+                        radio.checked = true;
+                        selectService(radio.value);
+                        hideSettings();
+                    }
+                });
+            });
+        }
+
+        function selectService(newService) {
+            if (newService === currentService) return;
+            
+            // Stop current recording if active
+            if (isRecording) {
+                stopRecording();
+            }
+            
+            // Clear conversation
+            clearConversation();
+            
+            // Update current service
+            currentService = newService;
+            
+            console.log(`Switched STT service to: ${newService}`);
+        }
+
         function toggleScreenRotation() {
             isRotated = !isRotated;
             
@@ -1459,6 +1805,46 @@
                 container.classList.remove('rotated');
                 localStorage.removeItem('screenRotated');
             }
+        }
+
+        // Font size control functions
+        function increaseFontSize() {
+            if (currentFontSize < maxFontSize) {
+                currentFontSize += 2;
+                updateFontSize();
+                updateFontSizeButtons();
+            }
+        }
+
+        function decreaseFontSize() {
+            if (currentFontSize > minFontSize) {
+                currentFontSize -= 2;
+                updateFontSize();
+                updateFontSizeButtons();
+            }
+        }
+
+        function updateFontSize() {
+            transcriptionArea.style.fontSize = `${currentFontSize}px`;
+            // Store font size preference
+            localStorage.setItem('transcriptionFontSize', currentFontSize.toString());
+        }
+
+        function updateFontSizeButtons() {
+            decreaseFontBtn.disabled = currentFontSize <= minFontSize;
+            increaseFontBtn.disabled = currentFontSize >= maxFontSize;
+        }
+
+        function initializeFontSize() {
+            // Load saved font size from localStorage
+            const savedFontSize = localStorage.getItem('transcriptionFontSize');
+            if (savedFontSize) {
+                currentFontSize = parseInt(savedFontSize);
+                // Ensure it's within bounds
+                currentFontSize = Math.max(minFontSize, Math.min(maxFontSize, currentFontSize));
+            }
+            updateFontSize();
+            updateFontSizeButtons();
         }
 
         // Initialize clear button state
@@ -1474,6 +1860,9 @@
         }
         
         initializeRotation();
+        
+        // Initialize font size controls
+        initializeFontSize();
         
         // Handle mobile viewport changes (URL bar showing/hiding)
         function setViewportHeight() {
@@ -1543,139 +1932,10 @@
             console.log('PWA was installed');
         });
         
-        // Initialize service dropdown
-        initializeServiceDropdown();
+        // Initialize settings
+        initializeSettings();
 
-        // Custom dropdown functions
-        function toggleDropdown() {
-            const isOpen = dropdownContent.classList.contains('show');
-            if (isOpen) {
-                closeDropdown();
-            } else {
-                openDropdown();
-            }
-        }
-        
-        function openDropdown() {
-            // Position the dropdown relative to the trigger
-            const triggerRect = dropdownTrigger.getBoundingClientRect();
-            dropdownContent.style.top = `${triggerRect.bottom + 2}px`;
-            dropdownContent.style.left = `${triggerRect.left}px`;
-            dropdownContent.style.width = `${triggerRect.width}px`;
-            
-            dropdownContent.classList.add('show');
-            dropdownTrigger.classList.add('open');
-            updateDropdownOptions();
-        }
-        
-        function closeDropdown() {
-            dropdownContent.classList.remove('show');
-            dropdownTrigger.classList.remove('open');
-        }
-        
-        function selectService(newService) {
-            if (newService === currentService) return;
-            
-            // Stop current recording if active
-            if (isRecording) {
-                stopRecording();
-            }
-            
-            // Clear conversation
-            clearConversation();
-            
-            // Update current service
-            currentService = newService;
-            updateCurrentServiceDisplay();
-            
-            console.log(`Switched STT service to: ${newService}`);
-        }
-        
-        function updateCurrentServiceDisplay() {
-            const serviceInfo = getServiceInfo(currentService);
-            currentServiceName.textContent = serviceInfo.name;
-        }
-        
-        function updateDropdownOptions() {
-            const options = dropdownContent.querySelectorAll('.dropdown-option');
-            options.forEach(option => {
-                if (option.dataset.value === currentService) {
-                    option.classList.add('selected');
-                } else {
-                    option.classList.remove('selected');
-                }
-            });
-        }
-        
-        function getServiceDisplayName(service) {
-            switch(service) {
-                case 'deepgram': return 'Deepgram';
-                case 'google': return 'Google STT';
-                case 'auto': return 'Auto-select Model';
-                default: return service;
-            }
-        }
-        
-        function getServiceInfo(service) {
-            switch(service) {
-                case 'deepgram': 
-                    return { 
-                        name: 'Deepgram', 
-                        description: 'Fast real-time transcription' 
-                    };
-                case 'google': 
-                    return { 
-                        name: 'Google STT', 
-                        description: 'Enhanced accuracy' 
-                    };
-                case 'auto': 
-                    return { 
-                        name: 'Auto-select Model', 
-                        description: 'Best available service' 
-                    };
-                default: 
-                    return { 
-                        name: service, 
-                        description: 'Speech-to-text service' 
-                    };
-            }
-        }
-        
-        function initializeServiceDropdown() {
-            // Set initial service display
-            updateCurrentServiceDisplay();
-            
-            // Request available services from server
-            socket.emit('get-available-services');
-        }
-        
-        // Handle available services response
-        socket.on('available-services', (data) => {
-            console.log('Available services:', data);
-            
-            // Enable/disable dropdown options based on availability
-            const options = dropdownContent.querySelectorAll('.dropdown-option');
-            options.forEach(option => {
-                const service = option.dataset.value;
-                if (service === 'auto') {
-                    option.style.display = 'block'; // Auto is always available
-                    option.style.opacity = '1';
-                } else {
-                    if (data.services.includes(service)) {
-                        option.style.display = 'block';
-                        option.style.opacity = '1';
-                    } else {
-                        option.style.opacity = '0.5';
-                        option.style.pointerEvents = 'none';
-                    }
-                    
-                    if (!data.services.includes(service) && currentService === service) {
-                        // If current selection is not available, switch to auto
-                        selectService('auto');
-                    }
-                }
-            });
-        });
+
 
 
         
@@ -1687,5 +1947,4 @@
         });
     </script>
 </body>
-</html> 
 </html> 
