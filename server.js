@@ -3,11 +3,28 @@ const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
 const path = require('path');
+const basicAuth = require('express-basic-auth');
 const STTFactory = require('./services/stt-factory');
 
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
+
+// Basic authentication (only in production/Cloud Run environment)
+const isProduction = process.env.NODE_ENV === 'production' || process.env.K_SERVICE; // K_SERVICE indicates Cloud Run
+
+if (isProduction && process.env.AUTH_PASSWORD) {
+    console.log('🔒 Password authentication enabled for production');
+    app.use(basicAuth({
+        users: { 'user': process.env.AUTH_PASSWORD },
+        challenge: true,
+        realm: 'Voice Transcription App'
+    }));
+} else if (isProduction) {
+    console.log('⚠️ Running in production without authentication - consider setting AUTH_PASSWORD');
+} else {
+    console.log('🏠 Running locally - authentication disabled for development');
+}
 
 // Serve static files
 app.use(express.static('public'));

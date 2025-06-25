@@ -34,4 +34,11 @@ gcloud run deploy transcribe-app \
     --port 8080
 
 echo "✅ Deployment completed!"
-echo "📝 Don't forget to set your DEEPGRAM_API_KEY environment variable in the Cloud Run console!" 
+echo ""
+echo "📝 Next steps:"
+echo "1. Set your DEEPGRAM_API_KEY environment variable in the Cloud Run console"
+echo "2. For password protection, also set:"
+echo "   - AUTH_PASSWORD (e.g., 'your-secure-password')"
+echo ""
+echo "🔗 Configure environment variables at:"
+echo "https://console.cloud.google.com/run/detail/us-west2/transcribe-app/variables" 
