@@ -72,6 +72,11 @@
             z-index: 100;
         }
 
+        .dropdowns-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
 
         
         .model-selector {
@@ -81,9 +86,9 @@
 
         .custom-dropdown {
             position: relative;
-            min-width: 160px;
+            min-width: 140px;
             flex: 1;
-            max-width: 200px;
+            max-width: 160px;
         }
 
         .dropdown-trigger {
@@ -123,7 +128,7 @@
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8);
             z-index: 99999;
             display: none;
-            min-width: 200px;
+            min-width: 180px;
             opacity: 1;
             backdrop-filter: none;
         }
@@ -451,6 +456,13 @@
             margin: 0 auto;
         }
 
+        .center-controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
         .control-text-button {
             background: rgba(156, 163, 175, 0.1);
             border: 1px solid rgba(156, 163, 175, 0.2);
@@ -471,16 +483,16 @@
         }
 
         .control-button {
-            width: 100px;
-            height: 100px;
-            border-radius: 30px;
+            width: 75px;
+            height: 75px;
+            border-radius: 22px;
             border: none;
             cursor: pointer;
             transition: all 0.2s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 32px;
+            font-size: 24px;
             position: relative;
         }
 
@@ -501,6 +513,37 @@
         .pause-button:hover {
             background: #f5f5f5;
             transform: scale(1.05);
+        }
+
+        .rotation-button {
+            background: transparent;
+            border: none;
+            color: #6b7280;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 72px;
+            height: 72px;
+        }
+
+        .rotation-button:hover {
+            background: rgba(156, 163, 175, 0.1);
+            color: #9ca3af;
+            transform: scale(1.1);
+        }
+
+        .rotation-button:active {
+            transform: scale(0.95);
+        }
+
+        /* Screen rotation styles */
+        .container.rotated {
+            transform: rotate(180deg);
+            transform-origin: center center;
         }
 
         /* Tips Modal Styles */
@@ -698,7 +741,7 @@
             }
             
             .model-selector {
-                flex: 1.5;
+                flex: 1;
                 max-width: none;
             }
             
@@ -818,44 +861,52 @@
 <body>
     <div class="container">
         <div class="header">
-            <div class="model-selector">
-                <div class="custom-dropdown" id="customDropdown">
-                    <div class="dropdown-trigger" id="dropdownTrigger">
-                        <div class="current-service-name" id="currentServiceName">Google STT</div>
-                        <div class="dropdown-arrow">▼</div>
+            <div class="dropdowns-group">
+                <div class="model-selector">
+                    <div class="custom-dropdown" id="customDropdown">
+                        <div class="dropdown-trigger" id="dropdownTrigger">
+                            <div class="current-service-name" id="currentServiceName">Google STT</div>
+                            <div class="dropdown-arrow">▼</div>
+                        </div>
+                        <div class="dropdown-content" id="dropdownContent">
+                            <div class="dropdown-option" data-value="auto">
+                                <div class="option-name">Auto-select Model</div>
+                                <div class="option-description">Best available service</div>
+                            </div>
+                            <div class="dropdown-option" data-value="deepgram">
+                                <div class="option-name">Deepgram</div>
+                                <div class="option-description">Fast real-time transcription</div>
+                            </div>
+                            <div class="dropdown-option" data-value="google">
+                                <div class="option-name">Google STT</div>
+                                <div class="option-description">Enhanced accuracy</div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="dropdown-content" id="dropdownContent">
-                        <div class="dropdown-option" data-value="auto">
-                            <div class="option-name">Auto-select Model</div>
-                            <div class="option-description">Best available service</div>
+                </div>
+                <div class="language-selector">
+                    <div class="language-dropdown" id="languageDropdown">
+                        <div class="language-dropdown-trigger" id="languageDropdownTrigger">
+                            <div class="language-option-name" id="currentLanguageName">Spanish</div>
+                            <div class="language-dropdown-arrow">▼</div>
                         </div>
-                        <div class="dropdown-option" data-value="deepgram">
-                            <div class="option-name">Deepgram</div>
-                            <div class="option-description">Fast real-time transcription</div>
-                        </div>
-                        <div class="dropdown-option" data-value="google">
-                            <div class="option-name">Google STT</div>
-                            <div class="option-description">Enhanced accuracy</div>
+                        <div class="language-dropdown-content" id="languageDropdownContent">
+                            <div class="language-dropdown-option" data-value="es">
+                                <div class="language-option-name">Spanish</div>
+                            </div>
+                            <div class="language-dropdown-option" data-value="en">
+                                <div class="language-option-name">English</div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="language-selector">
-                <div class="language-dropdown" id="languageDropdown">
-                    <div class="language-dropdown-trigger" id="languageDropdownTrigger">
-                        <div class="language-option-name" id="currentLanguageName">Spanish</div>
-                        <div class="language-dropdown-arrow">▼</div>
-                    </div>
-                    <div class="language-dropdown-content" id="languageDropdownContent">
-                        <div class="language-dropdown-option" data-value="es">
-                            <div class="language-option-name">Spanish</div>
-                        </div>
-                        <div class="language-dropdown-option" data-value="en">
-                            <div class="language-option-name">English</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <button class="control-text-button" id="tipsBtn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 21h6"/>
+                    <path d="M12 3a6 6 0 0 0-6 6v3a4 4 0 0 0 4 4h4a4 4 0 0 0 4-4V9a6 6 0 0 0-6-6Z"/>
+                </svg>
+            </button>
         </div>
         
         <div class="transcription-area" id="transcriptionArea">
@@ -882,17 +933,30 @@
                         <path d="m6 6 12 12"/>
                     </svg>
                 </button>
-                <button class="control-button record-button" id="recordBtn">
-                    <span id="recordIcon">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M8 5v14l11-7z"/>
-                        </svg>
-                    </span>
-                </button>
-                <button class="control-text-button" id="tipsBtn">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M9 21h6"/>
-                        <path d="M12 3a6 6 0 0 0-6 6v3a4 4 0 0 0 4 4h4a4 4 0 0 0 4-4V9a6 6 0 0 0-6-6Z"/>
+                <div class="center-controls">
+                    <button class="control-button record-button" id="recordBtn">
+                        <span id="recordIcon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M8 5v14l11-7z"/>
+                            </svg>
+                        </span>
+                    </button>
+                </div>
+                <button class="control-text-button" id="rotationBtn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+                        <!-- Phone body as simple rectangle -->
+                        <rect x="8" y="6" width="8" height="12" rx="1" ry="1" stroke-width="1"/>
+                        
+                        <!-- Circular rotation arrows around the phone -->
+                        <!-- Top-right curved arrow (clockwise) -->
+                        <path d="M 12 3 A 6.5 6.5 0 0 1 19 10" stroke-width="1"/>
+                        <!-- Top arrow head pointing clockwise (larger and more prominent) -->
+                        <polygon points="17.5,8.5 20.5,10 17.5,11.5" fill="white" stroke="none"/>
+                        
+                        <!-- Bottom-left curved arrow (counter-clockwise) -->
+                        <path d="M 12 21 A 6.5 6.5 0 0 1 5 14" stroke-width="1"/>
+                        <!-- Bottom arrow head pointing counter-clockwise (larger and more prominent) -->
+                        <polygon points="6.5,13.5 3.5,14 6.5,15.5" fill="white" stroke="none"/>
                     </svg>
                 </button>
             </div>
@@ -944,6 +1008,8 @@
         const languageDropdownTrigger = document.getElementById('languageDropdownTrigger');
         const languageDropdownContent = document.getElementById('languageDropdownContent');
         const currentLanguageName = document.getElementById('currentLanguageName');
+        const rotationBtn = document.getElementById('rotationBtn');
+        const container = document.querySelector('.container');
         
         let isRecording = false;
         let mediaRecorder;
@@ -953,6 +1019,7 @@
         let currentService = 'google';
         let currentLanguage = 'es';
         let isOnline = navigator.onLine;
+        let isRotated = false;
 
         // Network status functions
         function updateOnlineStatus() {
@@ -1044,6 +1111,9 @@
         clearBtn.addEventListener('click', clearConversation);
         tipsBtn.addEventListener('click', showTips);
         tipsClose.addEventListener('click', hideTips);
+        
+        // Screen rotation functionality
+        rotationBtn.addEventListener('click', toggleScreenRotation);
         
         // Close tips modal when clicking outside
         tipsModal.addEventListener('click', (e) => {
@@ -1378,8 +1448,32 @@
             tipsModal.classList.remove('show');
         }
 
+        function toggleScreenRotation() {
+            isRotated = !isRotated;
+            
+            if (isRotated) {
+                container.classList.add('rotated');
+                // Store rotation state in localStorage
+                localStorage.setItem('screenRotated', 'true');
+            } else {
+                container.classList.remove('rotated');
+                localStorage.removeItem('screenRotated');
+            }
+        }
+
         // Initialize clear button state
         updateClearButton();
+        
+        // Initialize screen rotation state
+        function initializeRotation() {
+            const savedRotation = localStorage.getItem('screenRotated');
+            if (savedRotation === 'true') {
+                isRotated = true;
+                container.classList.add('rotated');
+            }
+        }
+        
+        initializeRotation();
         
         // Handle mobile viewport changes (URL bar showing/hiding)
         function setViewportHeight() {
