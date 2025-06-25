@@ -92,6 +92,8 @@
             font-size: 14px;
             width: 100%;
             min-height: 44px; /* Touch-friendly minimum */
+            -webkit-tap-highlight-color: transparent; /* Remove iOS tap highlight */
+            user-select: none; /* Prevent text selection on touch */
         }
 
         .dropdown-trigger:hover {
@@ -133,6 +135,8 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
+            -webkit-tap-highlight-color: transparent; /* Remove iOS tap highlight */
+            user-select: none; /* Prevent text selection on touch */
         }
 
         .dropdown-option:last-child {
@@ -346,6 +350,8 @@
             font-size: 14px;
             width: 100%;
             min-height: 44px; /* Touch-friendly minimum */
+            -webkit-tap-highlight-color: transparent; /* Remove iOS tap highlight */
+            user-select: none; /* Prevent text selection on touch */
         }
 
         .language-dropdown-trigger:hover {
@@ -386,6 +392,8 @@
             min-height: 48px; /* Touch-friendly */
             display: flex;
             align-items: center;
+            -webkit-tap-highlight-color: transparent; /* Remove iOS tap highlight */
+            user-select: none; /* Prevent text selection on touch */
         }
 
         .language-dropdown-option:last-child {
@@ -988,8 +996,15 @@
             }
         });
         
-        // Language dropdown functionality
-        languageDropdownTrigger.addEventListener('click', toggleLanguageDropdown);
+        // Language dropdown functionality - handle both click and touch
+        function handleLanguageTrigger(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            toggleLanguageDropdown();
+        }
+        
+        languageDropdownTrigger.addEventListener('click', handleLanguageTrigger);
+        languageDropdownTrigger.addEventListener('touchend', handleLanguageTrigger);
         
         // Close language dropdown when clicking outside
         document.addEventListener('click', (e) => {
@@ -998,15 +1013,20 @@
             }
         });
         
-        // Handle language option selection
-        languageDropdownContent.addEventListener('click', (e) => {
+        // Handle language option selection - both click and touch events
+        function handleLanguageSelection(e) {
+            e.preventDefault();
+            e.stopPropagation();
             const option = e.target.closest('.language-dropdown-option');
             if (option) {
                 const value = option.dataset.value;
                 selectLanguage(value);
                 closeLanguageDropdown();
             }
-        });
+        }
+        
+        languageDropdownContent.addEventListener('click', handleLanguageSelection);
+        languageDropdownContent.addEventListener('touchend', handleLanguageSelection);
         
         function toggleLanguageDropdown() {
             const trigger = languageDropdownTrigger;
@@ -1055,8 +1075,15 @@
             }
         }
         
-        // Custom dropdown functionality
-        dropdownTrigger.addEventListener('click', toggleDropdown);
+        // Custom dropdown functionality - handle both click and touch
+        function handleDropdownTrigger(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            toggleDropdown();
+        }
+        
+        dropdownTrigger.addEventListener('click', handleDropdownTrigger);
+        dropdownTrigger.addEventListener('touchend', handleDropdownTrigger);
         
         // Close dropdown when clicking outside
         document.addEventListener('click', (e) => {
@@ -1065,15 +1092,20 @@
             }
         });
         
-        // Handle option selection
-        dropdownContent.addEventListener('click', (e) => {
+        // Handle option selection - both click and touch events
+        function handleDropdownSelection(e) {
+            e.preventDefault();
+            e.stopPropagation();
             const option = e.target.closest('.dropdown-option');
             if (option) {
                 const value = option.dataset.value;
                 selectService(value);
                 closeDropdown();
             }
-        });
+        }
+        
+        dropdownContent.addEventListener('click', handleDropdownSelection);
+        dropdownContent.addEventListener('touchend', handleDropdownSelection);
         
         function toggleRecording() {
             if (isRecording) {
