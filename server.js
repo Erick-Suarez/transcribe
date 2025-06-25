@@ -15,11 +15,29 @@ const isProduction = process.env.NODE_ENV === 'production' || process.env.K_SERV
 
 if (isProduction && process.env.AUTH_PASSWORD) {
     console.log('🔒 Password authentication enabled for production');
-    app.use(basicAuth({
-        users: { 'user': process.env.AUTH_PASSWORD },
-        challenge: true,
-        realm: 'Voice Transcription App'
-    }));
+    
+    // Skip authentication for icon files and manifest
+    app.use((req, res, next) => {
+        const publicPaths = [
+            '/apple-touch-icon.png',
+            '/icon.svg',
+            '/icon-192.svg', 
+            '/icon-512.svg',
+            '/manifest.json',
+            '/sw.js'
+        ];
+        
+        if (publicPaths.includes(req.path)) {
+            return next(); // Skip authentication for these files
+        }
+        
+        // Apply authentication for all other routes
+        basicAuth({
+            users: { 'user': process.env.AUTH_PASSWORD },
+            challenge: true,
+            realm: 'Voice Transcription App'
+        })(req, res, next);
+    });
 } else if (isProduction) {
     console.log('⚠️ Running in production without authentication - consider setting AUTH_PASSWORD');
 } else {
