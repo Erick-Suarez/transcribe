@@ -46,6 +46,7 @@
             background: rgba(26, 26, 26, 0.95);
             backdrop-filter: blur(10px);
             flex-shrink: 0;
+            gap: 12px;
         }
 
 
@@ -56,14 +57,16 @@
 
         .custom-dropdown {
             position: relative;
-            min-width: 180px;
+            min-width: 160px;
+            flex: 1;
+            max-width: 200px;
         }
 
         .dropdown-trigger {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 8px 12px;
+            padding: 10px 12px;
             background: #2d2d2d;
             border: 1px solid #404040;
             border-radius: 8px;
@@ -71,6 +74,8 @@
             cursor: pointer;
             transition: all 0.2s ease;
             font-size: 14px;
+            width: 100%;
+            min-height: 44px; /* Touch-friendly minimum */
         }
 
         .dropdown-trigger:hover {
@@ -88,6 +93,7 @@
             position: absolute;
             top: 100%;
             left: 0;
+            right: 0;
             background: #2d2d2d;
             border: 1px solid #404040;
             border-top: none;
@@ -95,7 +101,6 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
             z-index: 1000;
             display: none;
-            min-width: 180px;
         }
 
         .dropdown-content.show {
@@ -103,11 +108,15 @@
         }
 
         .dropdown-option {
-            padding: 12px 16px;
+            padding: 14px 16px;
             cursor: pointer;
             transition: background-color 0.15s ease;
             border-bottom: 1px solid #404040;
             font-size: 14px;
+            min-height: 48px; /* Touch-friendly */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
         .dropdown-option:last-child {
@@ -297,14 +306,16 @@
 
         .language-dropdown {
             position: relative;
-            min-width: 140px;
+            min-width: 100px;
+            flex: 1;
+            max-width: 140px;
         }
 
         .language-dropdown-trigger {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 8px 12px;
+            padding: 10px 12px;
             background: #2d2d2d;
             border: 1px solid #404040;
             border-radius: 8px;
@@ -312,6 +323,8 @@
             cursor: pointer;
             transition: all 0.2s ease;
             font-size: 14px;
+            width: 100%;
+            min-height: 44px; /* Touch-friendly minimum */
         }
 
         .language-dropdown-trigger:hover {
@@ -344,11 +357,14 @@
         }
 
         .language-dropdown-option {
-            padding: 12px 16px;
+            padding: 14px 16px;
             cursor: pointer;
             transition: background-color 0.15s ease;
             border-bottom: 1px solid #404040;
             font-size: 14px;
+            min-height: 48px; /* Touch-friendly */
+            display: flex;
+            align-items: center;
         }
 
         .language-dropdown-option:last-child {
@@ -644,6 +660,47 @@
         @media (max-width: 768px) {
             .header {
                 padding: 12px 16px;
+                gap: 8px;
+            }
+            
+            .model-selector {
+                flex: 1.5;
+                max-width: none;
+            }
+            
+            .language-selector {
+                flex: 1;
+                max-width: none;
+            }
+            
+            .custom-dropdown {
+                min-width: unset;
+                max-width: none;
+            }
+            
+            .language-dropdown {
+                min-width: unset;
+                max-width: none;
+            }
+            
+            .dropdown-trigger, .language-dropdown-trigger {
+                padding: 12px 10px;
+                font-size: 13px;
+                min-height: 48px; /* Larger touch target on mobile */
+            }
+            
+            .current-service-name {
+                font-size: 13px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            
+            .language-option-name {
+                font-size: 13px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
             }
             
             .transcription-area {
@@ -730,7 +787,7 @@
             <div class="model-selector">
                 <div class="custom-dropdown" id="customDropdown">
                     <div class="dropdown-trigger" id="dropdownTrigger">
-                        <div class="current-service-name" id="currentServiceName">Auto-select Model</div>
+                        <div class="current-service-name" id="currentServiceName">Google STT</div>
                         <div class="dropdown-arrow">▼</div>
                     </div>
                     <div class="dropdown-content" id="dropdownContent">
@@ -856,7 +913,7 @@
         let socket;
         let finalTranscript = '';
         let audioContext;
-        let currentService = 'auto';
+        let currentService = 'google';
         let currentLanguage = 'es';
 
         
