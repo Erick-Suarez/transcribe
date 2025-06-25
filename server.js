@@ -4,17 +4,59 @@ const http = require('http');
 const socketIo = require('socket.io');
 const path = require('path');
 const basicAuth = require('express-basic-auth');
+const session = require('express-session');
+const crypto = require('crypto');
 const STTFactory = require('./services/stt-factory');
 
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 
-// Basic authentication (only in production/Cloud Run environment)
+// Configure session middleware
+const sessionSecret = process.env.SESSION_SECRET || crypto.randomBytes(32).toString('hex');
+app.use(session({
+    secret: sessionSecret,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        secure: false, // Set to true in production with HTTPS
+        httpOnly: true,
+        maxAge: 90 * 24 * 60 * 60 * 1000 // 90 days
+    }
+}));
+
+// Session-based authentication (only in production/Cloud Run environment)
 const isProduction = process.env.NODE_ENV === 'production' || process.env.K_SERVICE; // K_SERVICE indicates Cloud Run
 
+// Authentication middleware
+function requireAuth(req, res, next) {
+    // Check if user is already authenticated via session
+    if (req.session && req.session.authenticated) {
+        return next();
+    }
+    
+    // If not authenticated, try basic auth
+    basicAuth({
+        users: { 'user': process.env.AUTH_PASSWORD },
+        challenge: true,
+        realm: 'Voice Transcription App'
+    })(req, res, (err) => {
+        if (err) {
+            return next(err);
+        }
+        // If basic auth succeeded, mark session as authenticated
+        req.session.authenticated = true;
+        req.session.save((err) => {
+            if (err) {
+                console.error('Session save error:', err);
+            }
+            next();
+        });
+    });
+}
+
 if (isProduction && process.env.AUTH_PASSWORD) {
-    console.log('🔒 Password authentication enabled for production');
+    console.log('🔒 Session-based authentication enabled for production');
     
     // Skip authentication for icon files and manifest
     app.use((req, res, next) => {
@@ -31,13 +73,12 @@ if (isProduction && process.env.AUTH_PASSWORD) {
             return next(); // Skip authentication for these files
         }
         
-        // Apply authentication for all other routes
-        basicAuth({
-            users: { 'user': process.env.AUTH_PASSWORD },
-            challenge: true,
-            realm: 'Voice Transcription App'
-        })(req, res, next);
+        // Apply session-based authentication for all other routes
+        requireAuth(req, res, next);
     });
+    
+
+    
 } else if (isProduction) {
     console.log('⚠️ Running in production without authentication - consider setting AUTH_PASSWORD');
 } else {
