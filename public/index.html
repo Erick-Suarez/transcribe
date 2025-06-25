@@ -49,7 +49,7 @@
 
         .custom-dropdown {
             position: relative;
-            min-width: 140px;
+            min-width: 180px;
         }
 
         .dropdown-trigger {
@@ -300,6 +300,7 @@
         .language-dropdown-content {
             position: absolute;
             top: 100%;
+            left: 0;
             right: 0;
             background: #2d2d2d;
             border: 1px solid #404040;
@@ -308,7 +309,6 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
             z-index: 1000;
             display: none;
-            min-width: 180px;
         }
 
         .language-dropdown-content.show {
@@ -373,15 +373,31 @@
 
         .controls-section {
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
             align-items: center;
             margin-bottom: 30px;
+            max-width: 300px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
-        .clear-section {
-            display: flex;
-            justify-content: center;
-            align-items: center;
+        .control-text-button {
+            background: rgba(156, 163, 175, 0.1);
+            border: 1px solid rgba(156, 163, 175, 0.2);
+            color: #d1d5db;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            padding: 12px 16px;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            min-width: 60px;
+        }
+
+        .control-text-button:hover {
+            background: rgba(156, 163, 175, 0.2);
+            border-color: rgba(156, 163, 175, 0.4);
+            color: #ffffff;
         }
 
         .control-button {
@@ -399,36 +415,130 @@
         }
 
         .record-button {
-            background: #ff9999;
+            background: #ffffff;
             color: #000000;
         }
 
         .record-button:hover {
-            background: #ff8888;
+            background: #f5f5f5;
             transform: scale(1.05);
         }
 
         .pause-button {
-            background: #ff9999;
+            background: #ffffff;
         }
 
         .pause-button:hover {
-            background: #ff8888;
+            background: #f5f5f5;
             transform: scale(1.05);
         }
 
-        .control-text {
+        /* Tips Modal Styles */
+        .tips-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .tips-modal.show {
+            display: flex;
+        }
+
+        .tips-content {
+            background: #1a1a1a;
+            border: 1px solid #2d2d2d;
+            border-radius: 12px;
+            padding: 32px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .tips-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            border-bottom: 1px solid #2d2d2d;
+            padding-bottom: 16px;
+        }
+
+        .tips-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .tips-close {
+            background: none;
+            border: none;
             color: #9ca3af;
-            font-size: 16px;
+            font-size: 24px;
             cursor: pointer;
-            padding: 12px 16px;
-            border-radius: 6px;
+            padding: 4px;
+            border-radius: 4px;
             transition: all 0.2s ease;
         }
 
-        .control-text:hover {
+        .tips-close:hover {
             background: #2d2d2d;
             color: #ffffff;
+        }
+
+        .tips-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .tips-list li {
+            padding: 12px 0;
+            color: #e5e7eb;
+            font-size: 16px;
+            line-height: 1.6;
+            display: flex;
+            align-items: flex-start;
+            border-bottom: 1px solid #2d2d2d;
+        }
+
+        .tips-list li:last-child {
+            border-bottom: none;
+        }
+
+        .tips-list li::before {
+            content: '💡';
+            margin-right: 12px;
+            margin-top: 2px;
+            font-size: 16px;
+        }
+
+        .tips-note {
+            background: #2d2d2d;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 20px;
+            border-left: 3px solid #ff9999;
+        }
+
+        .tips-note-title {
+            font-weight: 600;
+            color: #ff9999;
+            margin-bottom: 8px;
+        }
+
+        .tips-note-text {
+            color: #d1d5db;
+            font-size: 14px;
+            line-height: 1.5;
         }
         
         .error {
@@ -452,6 +562,57 @@
             font-size: 64px;
             margin-bottom: 20px;
             opacity: 0.5;
+        }
+
+        .audio-visualizer {
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            height: 48px;
+            gap: 4px;
+        }
+
+        .audio-visualizer .bar {
+            width: 4px;
+            background: #9ca3af;
+            border-radius: 2px;
+            animation: audioWave 1.5s ease-in-out infinite;
+        }
+
+        .audio-visualizer .bar:nth-child(1) {
+            height: 20px;
+            animation-delay: 0s;
+        }
+
+        .audio-visualizer .bar:nth-child(2) {
+            height: 35px;
+            animation-delay: 0.1s;
+        }
+
+        .audio-visualizer .bar:nth-child(3) {
+            height: 48px;
+            animation-delay: 0.2s;
+        }
+
+        .audio-visualizer .bar:nth-child(4) {
+            height: 30px;
+            animation-delay: 0.3s;
+        }
+
+        .audio-visualizer .bar:nth-child(5) {
+            height: 15px;
+            animation-delay: 0.4s;
+        }
+
+        @keyframes audioWave {
+            0%, 100% {
+                transform: scaleY(0.3);
+                opacity: 0.5;
+            }
+            50% {
+                transform: scaleY(1);
+                opacity: 1;
+            }
         }
 
         @media (max-width: 768px) {
@@ -512,12 +673,12 @@
             <div class="model-selector">
                 <div class="custom-dropdown" id="customDropdown">
                     <div class="dropdown-trigger" id="dropdownTrigger">
-                        <div class="current-service-name" id="currentServiceName">Auto-select</div>
+                        <div class="current-service-name" id="currentServiceName">Auto-select Model</div>
                         <div class="dropdown-arrow">▼</div>
                     </div>
                     <div class="dropdown-content" id="dropdownContent">
                         <div class="dropdown-option" data-value="auto">
-                            <div class="option-name">Auto-select</div>
+                            <div class="option-name">Auto-select Model</div>
                             <div class="option-description">Best available service</div>
                         </div>
                         <div class="dropdown-option" data-value="deepgram">
@@ -534,15 +695,15 @@
             <div class="language-selector">
                 <div class="language-dropdown" id="languageDropdown">
                     <div class="language-dropdown-trigger" id="languageDropdownTrigger">
-                        <div class="language-option-name" id="currentLanguageName">🇪🇸 Spanish</div>
+                        <div class="language-option-name" id="currentLanguageName">Spanish</div>
                         <div class="language-dropdown-arrow">▼</div>
                     </div>
                     <div class="language-dropdown-content" id="languageDropdownContent">
                         <div class="language-dropdown-option" data-value="es">
-                            <div class="language-option-name">🇪🇸 Spanish</div>
+                            <div class="language-option-name">Spanish</div>
                         </div>
                         <div class="language-dropdown-option" data-value="en">
-                            <div class="language-option-name">🇺🇸 English</div>
+                            <div class="language-option-name">English</div>
                         </div>
                     </div>
                 </div>
@@ -551,7 +712,14 @@
         
         <div class="transcription-area" id="transcriptionArea">
             <div class="empty-state">
-                <div class="empty-state-icon">🎤</div>
+                <div class="empty-state-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
+                        <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                        <path d="M12 19v4"/>
+                        <path d="M8 23h8"/>
+                    </svg>
+                </div>
                 <div>Tap to start recording...</div>
             </div>
         </div>
@@ -560,14 +728,49 @@
 
         <div class="bottom-section">
             <div class="controls-section">
+                <button class="control-text-button" id="clearBtn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 6 6 18"/>
+                        <path d="m6 6 12 12"/>
+                    </svg>
+                </button>
                 <button class="control-button record-button" id="recordBtn">
                     <span class="recording-indicator" id="recordingIndicator" style="display: none;"></span>
                     <span id="recordIcon">▶</span>
                 </button>
+                <button class="control-text-button" id="tipsBtn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 21h6"/>
+                        <path d="M12 3a6 6 0 0 0-6 6v3a4 4 0 0 0 4 4h4a4 4 0 0 0 4-4V9a6 6 0 0 0-6-6Z"/>
+                    </svg>
+                </button>
             </div>
-            
-            <div class="clear-section">
-                <div class="control-text" id="clearBtn">Clear</div>
+        </div>
+
+        <!-- Tips Modal -->
+        <div class="tips-modal" id="tipsModal">
+            <div class="tips-content">
+                <div class="tips-header">
+                    <div class="tips-title">💡 Tips for Better Transcription</div>
+                    <button class="tips-close" id="tipsClose">×</button>
+                </div>
+                <ul class="tips-list">
+                    <li>Keep your microphone close to the speaker's mouth</li>
+                    <li>Speak clearly and at a steady pace</li>
+                    <li>Minimize background noise when possible</li>
+                    <li>Take brief pauses before a new person begins speaking</li>
+                    <li>Avoid overlapping speech for better accuracy</li>
+                    <li>Use Chrome browser for best audio support</li>
+                    <li>Ensure stable internet connection for real-time processing</li>
+                </ul>
+                <div class="tips-note">
+                    <div class="tips-note-title">Best Use Case</div>
+                    <div class="tips-note-text">
+                        This application works best in 1-on-1 settings or small group conversations. 
+                        For large meetings or conferences with multiple speakers, consider using 
+                        dedicated meeting transcription tools.
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -578,6 +781,9 @@
         const recordBtn = document.getElementById('recordBtn');
         const recordIcon = document.getElementById('recordIcon');
         const clearBtn = document.getElementById('clearBtn');
+        const tipsBtn = document.getElementById('tipsBtn');
+        const tipsModal = document.getElementById('tipsModal');
+        const tipsClose = document.getElementById('tipsClose');
         const dropdownTrigger = document.getElementById('dropdownTrigger');
         const dropdownContent = document.getElementById('dropdownContent');
         const currentServiceName = document.getElementById('currentServiceName');
@@ -637,6 +843,15 @@
 
         recordBtn.addEventListener('click', toggleRecording);
         clearBtn.addEventListener('click', clearConversation);
+        tipsBtn.addEventListener('click', showTips);
+        tipsClose.addEventListener('click', hideTips);
+        
+        // Close tips modal when clicking outside
+        tipsModal.addEventListener('click', (e) => {
+            if (e.target === tipsModal) {
+                hideTips();
+            }
+        });
         
         // Language dropdown functionality
         languageDropdownTrigger.addEventListener('click', toggleLanguageDropdown);
@@ -697,9 +912,9 @@
         function getLanguageInfo(language) {
             switch(language) {
                 case 'es': 
-                    return { name: '🇪🇸 Spanish' };
+                    return { name: 'Spanish' };
                 case 'en': 
-                    return { name: '🇺🇸 English' };
+                    return { name: 'English' };
                 default: 
                     return { name: language };
             }
@@ -808,9 +1023,9 @@
             if (!finalTranscript && !interimText) {
                 // Show different states based on whether we're recording or not
                 if (isRecording) {
-                    transcriptionArea.innerHTML = '<div class="empty-state"><div class="empty-state-icon">👂</div><div>Listening for speech...</div></div>';
+                    transcriptionArea.innerHTML = '<div class="empty-state"><div class="empty-state-icon"><div class="audio-visualizer"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div></div><div>Listening for speech...</div></div>';
                 } else {
-                    transcriptionArea.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🎤</div><div>Tap to start recording...</div></div>';
+                    transcriptionArea.innerHTML = '<div class="empty-state"><div class="empty-state-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><path d="M12 19v4"/><path d="M8 23h8"/></svg></div><div>Tap to start recording...</div></div>';
                 }
                 return;
             }
@@ -862,14 +1077,22 @@
         }
         
         function updateClearButton() {
-            // Button is always enabled in this design, just change opacity/color
-            if (finalTranscript.trim()) {
+            // Only gray out when showing default "Tap to start recording" state
+            if (finalTranscript.trim() || isRecording) {
                 clearBtn.style.opacity = '1';
-                clearBtn.style.color = '#ffffff';
+                clearBtn.style.color = '#d1d5db';
             } else {
                 clearBtn.style.opacity = '0.5';
                 clearBtn.style.color = '#9ca3af';
             }
+        }
+        
+        function showTips() {
+            tipsModal.classList.add('show');
+        }
+        
+        function hideTips() {
+            tipsModal.classList.remove('show');
         }
 
         // Initialize clear button state
@@ -937,7 +1160,7 @@
             switch(service) {
                 case 'deepgram': return 'Deepgram';
                 case 'google': return 'Google STT';
-                case 'auto': return 'Auto-select';
+                case 'auto': return 'Auto-select Model';
                 default: return service;
             }
         }
@@ -956,7 +1179,7 @@
                     };
                 case 'auto': 
                     return { 
-                        name: 'Auto-select', 
+                        name: 'Auto-select Model', 
                         description: 'Best available service' 
                     };
                 default: 
