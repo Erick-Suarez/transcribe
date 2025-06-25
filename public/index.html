@@ -3,7 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎤 Live Transcription</title>
+    <title>Transcribe</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="description" content="Real-time voice transcription app with multiple STT providers">
+    <meta name="theme-color" content="#1a1a1a">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Transcribe">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json">
+    
+    <!-- Icons -->
+    <link rel="apple-touch-icon" href="/apple-touch-icon.svg">
+    <link rel="icon" type="image/svg+xml" sizes="192x192" href="/icon-192.svg">
+    <link rel="icon" type="image/svg+xml" sizes="512x512" href="/icon-512.svg">
     <style>
         * {
             margin: 0;
@@ -1250,6 +1266,34 @@
         window.addEventListener('resize', setViewportHeight);
         window.addEventListener('orientationchange', () => {
             setTimeout(setViewportHeight, 100);
+        });
+        
+        // Register service worker for PWA functionality
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then((registration) => {
+                        console.log('SW registered: ', registration);
+                    })
+                    .catch((registrationError) => {
+                        console.log('SW registration failed: ', registrationError);
+                    });
+            });
+        }
+        
+        // PWA Installation prompt
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Prevent the mini-infobar from appearing on mobile
+            e.preventDefault();
+            // Stash the event so it can be triggered later
+            deferredPrompt = e;
+            console.log('PWA install prompt available');
+        });
+        
+        // Handle PWA installation
+        window.addEventListener('appinstalled', (evt) => {
+            console.log('PWA was installed');
         });
         
         // Initialize service dropdown

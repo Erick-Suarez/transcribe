@@ -1,0 +1,10 @@
+<svg width="192" height="192" viewBox="0 0 192 192" xmlns="http://www.w3.org/2000/svg">
+  <rect width="192" height="192" fill="#ffffff" rx="24"/>
+  <g transform="translate(96, 96)">
+    <!-- 4 audio bars centered -->
+    <rect x="-30" y="-24" width="8" height="48" fill="#000000" rx="4"/>
+    <rect x="-10" y="-36" width="8" height="72" fill="#000000" rx="4"/>
+    <rect x="10" y="-30" width="8" height="60" fill="#000000" rx="4"/>
+    <rect x="30" y="-18" width="8" height="36" fill="#000000" rx="4"/>
+  </g>
+</svg>
