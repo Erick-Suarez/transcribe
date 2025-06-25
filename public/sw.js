@@ -1,4 +1,4 @@
-const CACHE_NAME = 'transcribe-v5';
+const CACHE_NAME = 'transcribe-v6';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -6,7 +6,7 @@ const urlsToCache = [
   '/socket.io/socket.io.js',
   '/icon-192.svg',
   '/icon-512.svg',
-  '/apple-touch-icon.svg'
+  '/apple-touch-icon.png'
 ];
 
 // Install event - cache resources
