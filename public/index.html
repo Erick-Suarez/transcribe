@@ -13,55 +13,135 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
-            background: #0f0f0f;
+            background: #000000;
             color: #ffffff;
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            margin: 0;
+            padding: 0;
             line-height: 1.6;
         }
         
         .container {
             background: #1a1a1a;
-            border: 1px solid #2d2d2d;
-            border-radius: 12px;
-            padding: 48px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            max-width: 900px;
-            width: 95%;
-            margin: 20px;
+            min-height: 100vh;
+            width: 100%;
+            padding: 40px 60px;
+            display: flex;
+            flex-direction: column;
+            max-width: none;
         }
         
         .header {
-            text-align: center;
-            margin-bottom: 40px;
-            border-bottom: 1px solid #2d2d2d;
-            padding-bottom: 32px;
-        }
-
-        .header h1 {
-            font-size: 2.25rem;
-            font-weight: 600;
-            margin-bottom: 12px;
-            color: #ffffff;
-            letter-spacing: -0.025em;
-        }
-
-        .header p {
-            color: #a1a1a1;
-            font-size: 1.125rem;
-            font-weight: 400;
-        }
-        
-        .controls {
-            text-align: center;
-            margin-bottom: 40px;
             display: flex;
-            gap: 16px;
-            justify-content: center;
+            justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
+            padding: 30px 0;
+            border-bottom: 1px solid #2d2d2d;
+            margin-bottom: 40px;
+            width: 100%;
+        }
+
+
+        
+        .model-selector {
+            position: relative;
+        }
+
+        .custom-dropdown {
+            position: relative;
+            min-width: 140px;
+        }
+
+        .dropdown-trigger {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
+            background: #2d2d2d;
+            border: 1px solid #404040;
+            border-radius: 8px;
+            color: #ffffff;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+        }
+
+        .dropdown-trigger:hover {
+            background: #353535;
+            border-color: #525252;
+        }
+
+        .dropdown-trigger.open {
+            border-color: #6b7280;
+            border-bottom-left-radius: 4px;
+            border-bottom-right-radius: 4px;
+        }
+
+        .dropdown-content {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: #2d2d2d;
+            border: 1px solid #404040;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            display: none;
+            min-width: 180px;
+        }
+
+        .dropdown-content.show {
+            display: block;
+        }
+
+        .dropdown-option {
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: background-color 0.15s ease;
+            border-bottom: 1px solid #404040;
+            font-size: 14px;
+        }
+
+        .dropdown-option:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-option:hover {
+            background: #3d3d3d;
+        }
+
+        .dropdown-option.selected {
+            background: #1f2937;
+        }
+
+        .option-name {
+            font-weight: 500;
+            color: #ffffff;
+            margin-bottom: 2px;
+            font-size: 14px;
+        }
+
+        .option-description {
+            color: #9ca3af;
+            font-size: 12px;
+            line-height: 1.3;
+        }
+
+        .dropdown-arrow {
+            transition: transform 0.2s ease;
+            color: #9ca3af;
+            font-size: 12px;
+        }
+
+        .dropdown-trigger.open .dropdown-arrow {
+            transform: rotate(180deg);
+        }
+
+        .current-service-name {
+            font-weight: 500;
+            color: #ffffff;
+            font-size: 14px;
         }
 
         .btn {
@@ -146,35 +226,24 @@
         }
         
         .transcription-area {
-            background: #0f0f0f;
-            border: 1px solid #374151;
-            border-radius: 8px;
-            padding: 32px;
-            min-height: 350px;
-            font-size: 1.125rem;
-            line-height: 1.75;
+            flex: 1;
+            padding: 40px 0;
+            font-size: 18px;
+            line-height: 1.7;
             color: #ffffff;
-            font-family: ui-monospace, SFMono-Regular, 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+            min-height: 400px;
+            overflow-y: auto;
+            width: 100%;
         }
         
         .transcript-line {
             margin-bottom: 16px;
-            padding: 12px 0;
-            border-bottom: 1px solid #1f2937;
             animation: fadeIn 0.3s ease-in;
-        }
-
-        .transcript-line:last-child {
-            border-bottom: none;
         }
         
         .interim-text {
-            color: #6b7280;
+            color: #9ca3af;
             font-style: italic;
-            background: #111827;
-            padding: 12px 16px;
-            border-radius: 6px;
-            border-left: 3px solid #374151;
             animation: pulse-text 1.5s infinite;
         }
 
@@ -188,27 +257,178 @@
             50% { opacity: 1; }
         }
 
-        .status {
-            text-align: center;
-            margin-top: 24px;
-            font-size: 0.875rem;
-            color: #9ca3af;
-            font-weight: 500;
+        .bottom-section {
+            margin-top: auto;
+            padding-top: 40px;
+            width: 100%;
         }
 
+        .language-selector {
+            position: relative;
+        }
+
+        .language-dropdown {
+            position: relative;
+            min-width: 140px;
+        }
+
+        .language-dropdown-trigger {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
+            background: #2d2d2d;
+            border: 1px solid #404040;
+            border-radius: 8px;
+            color: #ffffff;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+        }
+
+        .language-dropdown-trigger:hover {
+            background: #353535;
+            border-color: #525252;
+        }
+
+        .language-dropdown-trigger.open {
+            border-color: #6b7280;
+            border-bottom-left-radius: 4px;
+            border-bottom-right-radius: 4px;
+        }
+
+        .language-dropdown-content {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: #2d2d2d;
+            border: 1px solid #404040;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            display: none;
+            min-width: 180px;
+        }
+
+        .language-dropdown-content.show {
+            display: block;
+        }
+
+        .language-dropdown-option {
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: background-color 0.15s ease;
+            border-bottom: 1px solid #404040;
+            font-size: 14px;
+        }
+
+        .language-dropdown-option:last-child {
+            border-bottom: none;
+        }
+
+        .language-dropdown-option:hover {
+            background: #3d3d3d;
+        }
+
+        .language-dropdown-option.selected {
+            background: #1f2937;
+        }
+
+        .language-option-name {
+            font-weight: 500;
+            color: #ffffff;
+            font-size: 14px;
+        }
+
+        .language-dropdown-arrow {
+            transition: transform 0.2s ease;
+            color: #9ca3af;
+            font-size: 12px;
+        }
+
+        .language-dropdown-trigger.open .language-dropdown-arrow {
+            transform: rotate(180deg);
+        }
+
+
+
+
+
         .recording-indicator {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            background: #ffffff;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 10px;
+            height: 10px;
+            background: #ff6666;
             border-radius: 50%;
-            margin-right: 8px;
             animation: recording-pulse 1s infinite;
         }
 
         @keyframes recording-pulse {
             0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.5; transform: scale(1.2); }
+            50% { opacity: 0.3; transform: scale(1.1); }
+        }
+
+        .controls-section {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .clear-section {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .control-button {
+            width: 100px;
+            height: 100px;
+            border-radius: 30px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            position: relative;
+        }
+
+        .record-button {
+            background: #ff9999;
+            color: #000000;
+        }
+
+        .record-button:hover {
+            background: #ff8888;
+            transform: scale(1.05);
+        }
+
+        .pause-button {
+            background: #ff9999;
+        }
+
+        .pause-button:hover {
+            background: #ff8888;
+            transform: scale(1.05);
+        }
+
+        .control-text {
+            color: #9ca3af;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 12px 16px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .control-text:hover {
+            background: #2d2d2d;
+            color: #ffffff;
         }
         
         .error {
@@ -224,13 +444,13 @@
         .empty-state {
             text-align: center;
             color: #6b7280;
-            margin-top: 80px;
-            font-size: 1rem;
+            margin-top: 100px;
+            font-size: 18px;
         }
 
         .empty-state-icon {
-            font-size: 3rem;
-            margin-bottom: 16px;
+            font-size: 64px;
+            margin-bottom: 20px;
             opacity: 0.5;
         }
 
@@ -283,172 +503,239 @@
             background: #4b5563;
         }
 
-        .tips-section {
-            margin-top: 32px;
-            padding: 24px;
-            background: #111827;
-            border: 1px solid #374151;
-            border-radius: 8px;
-        }
 
-        .tips-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 16px;
-            cursor: pointer;
-            user-select: none;
-        }
-
-        .tips-icon {
-            font-size: 1.2rem;
-            margin-right: 8px;
-        }
-        
-        .tips-title {
-            font-size: 1rem;
-            font-weight: 500;
-            color: #d1d5db;
-            flex: 1;
-        }
-
-        .tips-toggle {
-            font-size: 0.875rem;
-            color: #6b7280;
-            transition: transform 0.2s ease;
-        }
-
-        .tips-toggle.expanded {
-            transform: rotate(180deg);
-        }
-        
-        .tips-content {
-            display: none;
-            animation: fadeIn 0.3s ease-in;
-        }
-
-        .tips-content.show {
-            display: block;
-        }
-
-        .tips-list {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-        }
-
-        .tips-list li {
-            padding: 8px 0;
-            color: #9ca3af;
-            font-size: 0.875rem;
-            line-height: 1.5;
-            display: flex;
-            align-items: flex-start;
-        }
-
-        .tips-list li::before {
-            content: '💡';
-            margin-right: 8px;
-            margin-top: 1px;
-            font-size: 0.75rem;
-        }
-
-        .tips-divider {
-            height: 1px;
-            background: #374151;
-            margin: 12px 0;
-        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🎤 Live Transcription</h1>
-            <p>Real-time Spanish voice transcription</p>
-        </div>
-        
-        <div class="controls">
-            <button id="startBtn" class="btn start-btn">Start Transcribing</button>
-            <button id="stopBtn" class="btn stop-btn" style="display: none;">Stop Transcribing</button>
-            <button id="clearBtn" class="btn clear-btn" disabled>New Conversation</button>
+            <div class="model-selector">
+                <div class="custom-dropdown" id="customDropdown">
+                    <div class="dropdown-trigger" id="dropdownTrigger">
+                        <div class="current-service-name" id="currentServiceName">Auto-select</div>
+                        <div class="dropdown-arrow">▼</div>
+                    </div>
+                    <div class="dropdown-content" id="dropdownContent">
+                        <div class="dropdown-option" data-value="auto">
+                            <div class="option-name">Auto-select</div>
+                            <div class="option-description">Best available service</div>
+                        </div>
+                        <div class="dropdown-option" data-value="deepgram">
+                            <div class="option-name">Deepgram</div>
+                            <div class="option-description">Fast real-time transcription</div>
+                        </div>
+                        <div class="dropdown-option" data-value="google">
+                            <div class="option-name">Google STT</div>
+                            <div class="option-description">Enhanced accuracy</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="language-selector">
+                <div class="language-dropdown" id="languageDropdown">
+                    <div class="language-dropdown-trigger" id="languageDropdownTrigger">
+                        <div class="language-option-name" id="currentLanguageName">🇪🇸 Spanish</div>
+                        <div class="language-dropdown-arrow">▼</div>
+                    </div>
+                    <div class="language-dropdown-content" id="languageDropdownContent">
+                        <div class="language-dropdown-option" data-value="es">
+                            <div class="language-option-name">🇪🇸 Spanish</div>
+                        </div>
+                        <div class="language-dropdown-option" data-value="en">
+                            <div class="language-option-name">🇺🇸 English</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
         
         <div class="transcription-area" id="transcriptionArea">
             <div class="empty-state">
                 <div class="empty-state-icon">🎤</div>
-                <div>Click "Start Transcribing" to begin transcription...</div>
+                <div>Tap to start recording...</div>
             </div>
         </div>
 
-        <div class="status" id="status"></div>
         <div id="error" class="error" style="display: none;"></div>
 
-        <div class="tips-section">
-            <div class="tips-header" onclick="toggleTips()">
-                <span class="tips-icon">💡</span>
-                <span class="tips-title">Tips for Better Transcription</span>
-                <span class="tips-toggle" id="tipsToggle">▼</span>
+        <div class="bottom-section">
+            <div class="controls-section">
+                <button class="control-button record-button" id="recordBtn">
+                    <span class="recording-indicator" id="recordingIndicator" style="display: none;"></span>
+                    <span id="recordIcon">▶</span>
+                </button>
             </div>
-            <div class="tips-content" id="tipsContent">
-                <ul class="tips-list">
-                    <li>Keep your microphone close to your mouth (6-12 inches away)</li>
-                    <li>Speak loudly and clearly at a steady pace</li>
-                    <li>Minimize background noise when possible</li>
-                    <li>Take brief pauses before a new person begins speaking</li>
-                    <li>Avoid overlapping speech for better accuracy</li>
-                    <li>Use Chrome browser for best audio support</li>
-                </ul>
-                <div class="tips-divider"></div>
-                <div style="color: #6b7280; font-size: 0.75rem; text-align: center;">
-                    Click the tips header to show/hide this section
-                </div>
+            
+            <div class="clear-section">
+                <div class="control-text" id="clearBtn">Clear</div>
             </div>
         </div>
+
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
-        const socket = io();
-        const startBtn = document.getElementById('startBtn');
-        const stopBtn = document.getElementById('stopBtn');
+        const recordBtn = document.getElementById('recordBtn');
+        const recordIcon = document.getElementById('recordIcon');
         const clearBtn = document.getElementById('clearBtn');
+        const dropdownTrigger = document.getElementById('dropdownTrigger');
+        const dropdownContent = document.getElementById('dropdownContent');
+        const currentServiceName = document.getElementById('currentServiceName');
         const transcriptionArea = document.getElementById('transcriptionArea');
-        const status = document.getElementById('status');
         const errorDiv = document.getElementById('error');
+        const recordingIndicator = document.getElementById('recordingIndicator');
+        const languageDropdownTrigger = document.getElementById('languageDropdownTrigger');
+        const languageDropdownContent = document.getElementById('languageDropdownContent');
+        const currentLanguageName = document.getElementById('currentLanguageName');
         
         let isRecording = false;
-        let audioContext;
-        let processor;
-        let mediaStream;
+        let mediaRecorder;
+        let socket;
         let finalTranscript = '';
+        let audioContext;
+        let currentService = 'auto';
+        let currentLanguage = 'es';
+
         
         // Check browser support
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
             showError('Your browser does not support audio transcription. Please use Chrome, Firefox, or Safari.');
         }
 
-        startBtn.addEventListener('click', startRecording);
-        stopBtn.addEventListener('click', stopRecording);
-        clearBtn.addEventListener('click', clearConversation);
+        // Initialize Socket.io connection
+        socket = io();
+        
+        socket.on('connect', () => {
+            console.log('Connected to server');
+        });
         
         socket.on('transcript', (data) => {
-            console.log('Received transcription:', data);
-            if (data.is_final) {
-                // Add final transcript
-                finalTranscript += data.text + '\n';
-                updateDisplay();
-                updateClearButton();
-            } else {
-                // Show interim result
-                updateDisplay(data.text);
+            console.log('Transcript received:', data);
+            
+            if (data.text) {
+                if (data.is_final) {
+                    // Add final transcript
+                    finalTranscript += data.text + '\n';
+                    updateDisplay();
+                    updateClearButton();
+                } else {
+                    // Show interim result
+                    updateDisplay(data.text);
+                }
             }
         });
         
         socket.on('error', (error) => {
-            showError('Transcription error: ' + error);
+            console.error('STT Error:', error);
+            showError(`${error.service ? error.service.charAt(0).toUpperCase() + error.service.slice(1) + ' ' : ''}error: ${error.message}`);
+            stopRecording();
+        });
+
+        socket.on('service-selected', (data) => {
+            console.log('Service selected:', data);
+        });
+
+        recordBtn.addEventListener('click', toggleRecording);
+        clearBtn.addEventListener('click', clearConversation);
+        
+        // Language dropdown functionality
+        languageDropdownTrigger.addEventListener('click', toggleLanguageDropdown);
+        
+        // Close language dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!document.getElementById('languageDropdown').contains(e.target)) {
+                closeLanguageDropdown();
+            }
         });
         
+        // Handle language option selection
+        languageDropdownContent.addEventListener('click', (e) => {
+            const option = e.target.closest('.language-dropdown-option');
+            if (option) {
+                const value = option.dataset.value;
+                selectLanguage(value);
+                closeLanguageDropdown();
+            }
+        });
+        
+        function toggleLanguageDropdown() {
+            const trigger = languageDropdownTrigger;
+            const content = languageDropdownContent;
+            
+            if (content.classList.contains('show')) {
+                closeLanguageDropdown();
+            } else {
+                trigger.classList.add('open');
+                content.classList.add('show');
+            }
+        }
+        
+        function closeLanguageDropdown() {
+            languageDropdownTrigger.classList.remove('open');
+            languageDropdownContent.classList.remove('show');
+        }
+        
+        function selectLanguage(newLanguage) {
+            if (newLanguage === currentLanguage) return;
+            
+            // Stop recording if active and clear transcript when changing language
+            if (isRecording) {
+                stopRecording();
+            }
+            clearConversation();
+            
+            currentLanguage = newLanguage;
+            updateCurrentLanguageDisplay();
+            console.log('Language changed to:', newLanguage);
+        }
+        
+        function updateCurrentLanguageDisplay() {
+            const languageInfo = getLanguageInfo(currentLanguage);
+            currentLanguageName.textContent = languageInfo.name;
+        }
+        
+        function getLanguageInfo(language) {
+            switch(language) {
+                case 'es': 
+                    return { name: '🇪🇸 Spanish' };
+                case 'en': 
+                    return { name: '🇺🇸 English' };
+                default: 
+                    return { name: language };
+            }
+        }
+        
+        // Custom dropdown functionality
+        dropdownTrigger.addEventListener('click', toggleDropdown);
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!document.getElementById('customDropdown').contains(e.target)) {
+                closeDropdown();
+            }
+        });
+        
+        // Handle option selection
+        dropdownContent.addEventListener('click', (e) => {
+            const option = e.target.closest('.dropdown-option');
+            if (option) {
+                const value = option.dataset.value;
+                selectService(value);
+                closeDropdown();
+            }
+        });
+        
+        function toggleRecording() {
+            if (isRecording) {
+                stopRecording();
+            } else {
+                startRecording();
+            }
+        }
+
         async function startRecording() {
             try {
+                // Get microphone access
                 const stream = await navigator.mediaDevices.getUserMedia({ 
                     audio: {
                         sampleRate: 16000,
@@ -458,45 +745,39 @@
                     } 
                 });
                 
-                // Create audio context
-                audioContext = new (window.AudioContext || window.webkitAudioContext)({
-                    sampleRate: 16000
+                // Start transcription on server with selected service and language
+                socket.emit('start-transcription', { 
+                    service: currentService,
+                    language: currentLanguage 
                 });
                 
+                // Set up audio processing
+                audioContext = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 16000 });
                 const source = audioContext.createMediaStreamSource(stream);
-                
-                // Create script processor for raw audio data
-                processor = audioContext.createScriptProcessor(4096, 1, 1);
+                const processor = audioContext.createScriptProcessor(4096, 1, 1);
                 
                 processor.onaudioprocess = (event) => {
-                    if (!isRecording) return;
-                    
                     const inputBuffer = event.inputBuffer;
                     const inputData = inputBuffer.getChannelData(0);
                     
                     // Convert float32 to int16
-                    const int16Data = new Int16Array(inputData.length);
+                    const int16Buffer = new Int16Array(inputData.length);
                     for (let i = 0; i < inputData.length; i++) {
-                        int16Data[i] = Math.max(-32768, Math.min(32767, inputData[i] * 32768));
+                        int16Buffer[i] = inputData[i] * 0x7FFF;
                     }
                     
-                    // Send raw PCM data to server
-                    socket.emit('audio-data', int16Data.buffer);
+                    // Send audio data to server
+                    socket.emit('audio-data', int16Buffer.buffer);
                 };
                 
                 source.connect(processor);
                 processor.connect(audioContext.destination);
                 
-                // Store references for cleanup
-                mediaStream = stream;
-                
-                socket.emit('start-transcription');
-
                 isRecording = true;
-                startBtn.style.display = 'none';
-                stopBtn.style.display = 'inline-block';
+                recordIcon.textContent = '⏸';
+                recordingIndicator.style.display = 'block';
+                
                 updateDisplay();
-                status.innerHTML = '<span class="recording-indicator"></span>Transcribing... Speak now!';
                 hideError();
                 
             } catch (error) {
@@ -506,29 +787,22 @@
         }
         
         function stopRecording() {
-            if (processor) {
-                processor.disconnect();
-                processor = null;
-            }
-            
             if (audioContext) {
                 audioContext.close();
                 audioContext = null;
             }
             
-            if (mediaStream) {
-                mediaStream.getTracks().forEach(track => track.stop());
-                mediaStream = null;
-            }
-            
+            // Stop transcription on server
             socket.emit('stop-transcription');
             
             isRecording = false;
-            startBtn.style.display = 'inline-block';
-            stopBtn.style.display = 'none';
+            recordIcon.textContent = '▶';
+            recordingIndicator.style.display = 'none';
+            
             updateDisplay();
-            status.textContent = 'Transcription stopped.';
         }
+        
+
 
         function updateDisplay(interimText = '') {
             if (!finalTranscript && !interimText) {
@@ -536,7 +810,7 @@
                 if (isRecording) {
                     transcriptionArea.innerHTML = '<div class="empty-state"><div class="empty-state-icon">👂</div><div>Listening for speech...</div></div>';
                 } else {
-                    transcriptionArea.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🎤</div><div>Click "Start Transcribing" to begin transcription...</div></div>';
+                    transcriptionArea.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🎤</div><div>Tap to start recording...</div></div>';
                 }
                 return;
             }
@@ -577,31 +851,159 @@
 
         function clearConversation() {
             finalTranscript = '';
+            
+            // Stop recording if active
+            if (isRecording) {
+                stopRecording();
+            }
+            
             updateDisplay();
             updateClearButton();
-            status.textContent = 'Conversation cleared. Ready to start transcribing.';
         }
         
         function updateClearButton() {
-            clearBtn.disabled = !finalTranscript.trim();
+            // Button is always enabled in this design, just change opacity/color
+            if (finalTranscript.trim()) {
+                clearBtn.style.opacity = '1';
+                clearBtn.style.color = '#ffffff';
+            } else {
+                clearBtn.style.opacity = '0.5';
+                clearBtn.style.color = '#9ca3af';
+            }
         }
 
         // Initialize clear button state
         updateClearButton();
+        
+        // Initialize service dropdown
+        initializeServiceDropdown();
 
-        // Tips toggle functionality
-        function toggleTips() {
-            const tipsContent = document.getElementById('tipsContent');
-            const tipsToggle = document.getElementById('tipsToggle');
-            
-            if (tipsContent.classList.contains('show')) {
-                tipsContent.classList.remove('show');
-                tipsToggle.classList.remove('expanded');
+        // Custom dropdown functions
+        function toggleDropdown() {
+            const isOpen = dropdownContent.classList.contains('show');
+            if (isOpen) {
+                closeDropdown();
             } else {
-                tipsContent.classList.add('show');
-                tipsToggle.classList.add('expanded');
+                openDropdown();
             }
         }
+        
+        function openDropdown() {
+            dropdownContent.classList.add('show');
+            dropdownTrigger.classList.add('open');
+            updateDropdownOptions();
+        }
+        
+        function closeDropdown() {
+            dropdownContent.classList.remove('show');
+            dropdownTrigger.classList.remove('open');
+        }
+        
+        function selectService(newService) {
+            if (newService === currentService) return;
+            
+            // Stop current recording if active
+            if (isRecording) {
+                stopRecording();
+            }
+            
+            // Clear conversation
+            clearConversation();
+            
+            // Update current service
+            currentService = newService;
+            updateCurrentServiceDisplay();
+            
+            console.log(`Switched STT service to: ${newService}`);
+        }
+        
+        function updateCurrentServiceDisplay() {
+            const serviceInfo = getServiceInfo(currentService);
+            currentServiceName.textContent = serviceInfo.name;
+        }
+        
+        function updateDropdownOptions() {
+            const options = dropdownContent.querySelectorAll('.dropdown-option');
+            options.forEach(option => {
+                if (option.dataset.value === currentService) {
+                    option.classList.add('selected');
+                } else {
+                    option.classList.remove('selected');
+                }
+            });
+        }
+        
+        function getServiceDisplayName(service) {
+            switch(service) {
+                case 'deepgram': return 'Deepgram';
+                case 'google': return 'Google STT';
+                case 'auto': return 'Auto-select';
+                default: return service;
+            }
+        }
+        
+        function getServiceInfo(service) {
+            switch(service) {
+                case 'deepgram': 
+                    return { 
+                        name: 'Deepgram', 
+                        description: 'Fast real-time transcription' 
+                    };
+                case 'google': 
+                    return { 
+                        name: 'Google STT', 
+                        description: 'Enhanced accuracy' 
+                    };
+                case 'auto': 
+                    return { 
+                        name: 'Auto-select', 
+                        description: 'Best available service' 
+                    };
+                default: 
+                    return { 
+                        name: service, 
+                        description: 'Speech-to-text service' 
+                    };
+            }
+        }
+        
+        function initializeServiceDropdown() {
+            // Set initial service display
+            updateCurrentServiceDisplay();
+            
+            // Request available services from server
+            socket.emit('get-available-services');
+        }
+        
+        // Handle available services response
+        socket.on('available-services', (data) => {
+            console.log('Available services:', data);
+            
+            // Enable/disable dropdown options based on availability
+            const options = dropdownContent.querySelectorAll('.dropdown-option');
+            options.forEach(option => {
+                const service = option.dataset.value;
+                if (service === 'auto') {
+                    option.style.display = 'block'; // Auto is always available
+                    option.style.opacity = '1';
+                } else {
+                    if (data.services.includes(service)) {
+                        option.style.display = 'block';
+                        option.style.opacity = '1';
+                    } else {
+                        option.style.opacity = '0.5';
+                        option.style.pointerEvents = 'none';
+                    }
+                    
+                    if (!data.services.includes(service) && currentService === service) {
+                        // If current selection is not available, switch to auto
+                        selectService('auto');
+                    }
+                }
+            });
+        });
+
+
         
         // Handle page unload
         window.addEventListener('beforeunload', () => {
