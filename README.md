@@ -1,6 +1,6 @@
 # 🎤 Voice Transcription Web App
 
-A beautiful, real-time Spanish voice transcription web application with a sleek ChatGPT-inspired design using Google Cloud Speech API.
+A beautiful, real-time Spanish voice transcription web application with a sleek ChatGPT-inspired design using Deepgram's advanced speech-to-text API.
 
 ## Features
 
@@ -13,7 +13,7 @@ A beautiful, real-time Spanish voice transcription web application with a sleek 
 ## Prerequisites
 
 - Node.js (v14 or higher)
-- Google Cloud Speech API credentials
+- Deepgram API key ([Get one here](https://console.deepgram.com/))
 - Modern web browser (Chrome, Firefox, Safari)
 
 ## Setup
@@ -23,12 +23,19 @@ A beautiful, real-time Spanish voice transcription web application with a sleek 
    npm install
    ```
 
-2. **Start the server:**
+2. **Set up environment variables:**
+   Create a `.env` file in the root directory:
+   ```env
+   DEEPGRAM_API_KEY=your_deepgram_api_key_here
+   PORT=3000
+   ```
+
+3. **Start the server:**
    ```bash
    npm start
    ```
 
-3. **Open your browser:**
+4. **Open your browser:**
    Navigate to `http://localhost:3000`
 
 ## Usage
@@ -42,7 +49,7 @@ A beautiful, real-time Spanish voice transcription web application with a sleek 
 
 - **Backend:** Node.js with Express and Socket.IO
 - **Frontend:** Vanilla HTML/CSS/JavaScript
-- **Speech API:** Google Cloud Speech API with Spanish language model
+- **Speech API:** Deepgram Nova-2 model with Spanish language support
 - **Audio Format:** WebM Opus at 48kHz
 - **Real-time:** WebSocket communication for live transcription
 
@@ -55,7 +62,7 @@ The app requires microphone access. Make sure to:
 
 ## Files
 
-- `server.js` - Main server with Socket.IO and Google Cloud Speech integration
+- `server.js` - Main server with Socket.IO and Deepgram integration
 - `public/index.html` - Web interface with audio recording and display
 - `package.json` - Dependencies and scripts
 
@@ -71,7 +78,7 @@ The app requires microphone access. Make sure to:
 
 ### Environment Variables for Production
 
-- `GOOGLE_APPLICATION_CREDENTIALS`: Your Google Cloud service account JSON key content
+- `DEEPGRAM_API_KEY`: Your Deepgram API key
 
 ## Troubleshooting
 

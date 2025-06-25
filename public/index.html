@@ -21,7 +21,7 @@
             justify-content: center;
             line-height: 1.6;
         }
-
+        
         .container {
             background: #1a1a1a;
             border: 1px solid #2d2d2d;
@@ -32,7 +32,7 @@
             width: 95%;
             margin: 20px;
         }
-
+        
         .header {
             text-align: center;
             margin-bottom: 40px;
@@ -53,7 +53,7 @@
             font-size: 1.125rem;
             font-weight: 400;
         }
-
+        
         .controls {
             text-align: center;
             margin-bottom: 40px;
@@ -87,7 +87,7 @@
             transform: translateY(-1px);
             box-shadow: 0 4px 12px rgba(255, 255, 255, 0.15);
         }
-
+        
         .stop-btn {
             background: #0f0f0f;
             color: #ffffff;
@@ -101,7 +101,7 @@
             transform: translateY(-1px);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         }
-
+        
         .stop-btn::before {
             content: '';
             position: absolute;
@@ -133,7 +133,7 @@
             transform: none;
             box-shadow: none;
         }
-
+        
         .clear-btn:disabled:hover {
             background: transparent;
             color: #6b7280;
@@ -144,7 +144,7 @@
             50% { left: 100%; }
             100% { left: 100%; }
         }
-
+        
         .transcription-area {
             background: #0f0f0f;
             border: 1px solid #374151;
@@ -156,7 +156,7 @@
             color: #ffffff;
             font-family: ui-monospace, SFMono-Regular, 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
         }
-
+        
         .transcript-line {
             margin-bottom: 16px;
             padding: 12px 0;
@@ -167,7 +167,7 @@
         .transcript-line:last-child {
             border-bottom: none;
         }
-
+        
         .interim-text {
             color: #6b7280;
             font-style: italic;
@@ -210,7 +210,7 @@
             0%, 100% { opacity: 1; transform: scale(1); }
             50% { opacity: 0.5; transform: scale(1.2); }
         }
-
+        
         .error {
             background: #1f1f1f;
             border: 1px solid #dc2626;
@@ -250,18 +250,18 @@
                 min-height: 280px;
             }
 
-                         .btn {
-                 min-width: 150px;
-                 padding: 14px 24px;
-             }
+            .btn {
+                min-width: 150px;
+                padding: 14px 24px;
+            }
 
-             .controls {
-                 gap: 12px;
-             }
+            .controls {
+                gap: 12px;
+            }
 
-             .clear-btn {
-                 min-width: 140px;
-             }
+            .clear-btn {
+                min-width: 140px;
+            }
         }
 
         /* Scrollbar styling */
@@ -303,7 +303,7 @@
             font-size: 1.2rem;
             margin-right: 8px;
         }
-
+        
         .tips-title {
             font-size: 1rem;
             font-weight: 500;
@@ -320,7 +320,7 @@
         .tips-toggle.expanded {
             transform: rotate(180deg);
         }
-
+        
         .tips-content {
             display: none;
             animation: fadeIn 0.3s ease-in;
@@ -365,13 +365,13 @@
             <h1>🎤 Live Transcription</h1>
             <p>Real-time Spanish voice transcription</p>
         </div>
-
+        
         <div class="controls">
             <button id="startBtn" class="btn start-btn">Start Transcribing</button>
             <button id="stopBtn" class="btn stop-btn" style="display: none;">Stop Transcribing</button>
             <button id="clearBtn" class="btn clear-btn" disabled>New Conversation</button>
         </div>
-
+        
         <div class="transcription-area" id="transcriptionArea">
             <div class="empty-state">
                 <div class="empty-state-icon">🎤</div>
@@ -414,11 +414,13 @@
         const transcriptionArea = document.getElementById('transcriptionArea');
         const status = document.getElementById('status');
         const errorDiv = document.getElementById('error');
-
-        let mediaRecorder;
+        
         let isRecording = false;
+        let audioContext;
+        let processor;
+        let mediaStream;
         let finalTranscript = '';
-
+        
         // Check browser support
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
             showError('Your browser does not support audio transcription. Please use Chrome, Firefox, or Safari.');
@@ -427,9 +429,10 @@
         startBtn.addEventListener('click', startRecording);
         stopBtn.addEventListener('click', stopRecording);
         clearBtn.addEventListener('click', clearConversation);
-
-        socket.on('transcription', (data) => {
-            if (data.isFinal) {
+        
+        socket.on('transcript', (data) => {
+            console.log('Received transcription:', data);
+            if (data.is_final) {
                 // Add final transcript
                 finalTranscript += data.text + '\n';
                 updateDisplay();
@@ -439,62 +442,91 @@
                 updateDisplay(data.text);
             }
         });
-
+        
         socket.on('error', (error) => {
             showError('Transcription error: ' + error);
         });
-
+        
         async function startRecording() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ 
                     audio: {
-                        sampleRate: 48000,
+                        sampleRate: 16000,
                         channelCount: 1,
                         echoCancellation: true,
                         noiseSuppression: true
                     } 
                 });
-
-                mediaRecorder = new MediaRecorder(stream, {
-                    mimeType: 'audio/webm;codecs=opus'
+                
+                // Create audio context
+                audioContext = new (window.AudioContext || window.webkitAudioContext)({
+                    sampleRate: 16000
                 });
-
-                mediaRecorder.ondataavailable = (event) => {
-                    if (event.data.size > 0) {
-                        event.data.arrayBuffer().then((buffer) => {
-                            socket.emit('audio-data', buffer);
-                        });
+                
+                const source = audioContext.createMediaStreamSource(stream);
+                
+                // Create script processor for raw audio data
+                processor = audioContext.createScriptProcessor(4096, 1, 1);
+                
+                processor.onaudioprocess = (event) => {
+                    if (!isRecording) return;
+                    
+                    const inputBuffer = event.inputBuffer;
+                    const inputData = inputBuffer.getChannelData(0);
+                    
+                    // Convert float32 to int16
+                    const int16Data = new Int16Array(inputData.length);
+                    for (let i = 0; i < inputData.length; i++) {
+                        int16Data[i] = Math.max(-32768, Math.min(32767, inputData[i] * 32768));
                     }
+                    
+                    // Send raw PCM data to server
+                    socket.emit('audio-data', int16Data.buffer);
                 };
-
-                mediaRecorder.start(100); // Send data every 100ms
-                socket.emit('start-recording');
+                
+                source.connect(processor);
+                processor.connect(audioContext.destination);
+                
+                // Store references for cleanup
+                mediaStream = stream;
+                
+                socket.emit('start-transcription');
 
                 isRecording = true;
                 startBtn.style.display = 'none';
                 stopBtn.style.display = 'inline-block';
-                updateDisplay(); // Update display to show listening state
+                updateDisplay();
                 status.innerHTML = '<span class="recording-indicator"></span>Transcribing... Speak now!';
                 hideError();
-
+                
             } catch (error) {
                 console.error('Error starting transcription:', error);
                 showError('Could not access microphone. Please check permissions and try again.');
             }
         }
-
+        
         function stopRecording() {
-            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-                mediaRecorder.stop();
-                mediaRecorder.stream.getTracks().forEach(track => track.stop());
+            if (processor) {
+                processor.disconnect();
+                processor = null;
             }
             
-            socket.emit('stop-recording');
+            if (audioContext) {
+                audioContext.close();
+                audioContext = null;
+            }
+            
+            if (mediaStream) {
+                mediaStream.getTracks().forEach(track => track.stop());
+                mediaStream = null;
+            }
+            
+            socket.emit('stop-transcription');
             
             isRecording = false;
             startBtn.style.display = 'inline-block';
             stopBtn.style.display = 'none';
-            updateDisplay(); // Update display to show correct state
+            updateDisplay();
             status.textContent = 'Transcription stopped.';
         }
 
@@ -527,7 +559,7 @@
             transcriptionArea.innerHTML = html;
             transcriptionArea.scrollTop = transcriptionArea.scrollHeight;
         }
-
+        
         function escapeHtml(text) {
             const div = document.createElement('div');
             div.textContent = text;
@@ -549,7 +581,7 @@
             updateClearButton();
             status.textContent = 'Conversation cleared. Ready to start transcribing.';
         }
-
+        
         function updateClearButton() {
             clearBtn.disabled = !finalTranscript.trim();
         }
@@ -570,7 +602,7 @@
                 tipsToggle.classList.add('expanded');
             }
         }
-
+        
         // Handle page unload
         window.addEventListener('beforeunload', () => {
             if (isRecording) {

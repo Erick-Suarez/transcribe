@@ -1,125 +1,115 @@
+require('dotenv').config();
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
-const speech = require('@google-cloud/speech');
-const cors = require('cors');
 const path = require('path');
+const { createClient, LiveTranscriptionEvents } = require("@deepgram/sdk");
 
 const app = express();
 const server = http.createServer(app);
-const io = socketIo(server, {
-  cors: {
-    origin: "*",
-    methods: ["GET", "POST"]
-  }
-});
+const io = socketIo(server);
 
-// Middleware
-app.use(cors());
+// Serve static files
 app.use(express.static('public'));
 
-// Serve the HTML file
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
+// Store Deepgram connections for each client
+const deepgramConnections = new Map();
 
-// Google Cloud Speech client
-let speechClient;
-if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
-  // Production: Use environment variable with JSON content
-  const credentials = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS);
-  speechClient = new speech.SpeechClient({ credentials });
-} else {
-  // Development: Use local file
-  speechClient = new speech.SpeechClient({
-    keyFilename: '/Users/ericksuarez/code/voice/cloud/psychic-lens-463904-i7-057d819844fc.json'
-  });
-}
-
-// Socket.IO connection handling
 io.on('connection', (socket) => {
-  console.log('Client connected:', socket.id);
-  
-  let recognizeStream = null;
+    console.log('Client connected:', socket.id);
 
-  socket.on('start-recording', () => {
-    console.log('Starting transcription for:', socket.id);
-    
-    // Configure the request
-    const request = {
-      config: {
-        encoding: 'WEBM_OPUS',
-        sampleRateHertz: 48000,
-        languageCode: 'es-ES',
-        enableAutomaticPunctuation: true,
-        model: 'default',
-        useEnhanced: true,
-      },
-      interimResults: true,
-      singleUtterance: false,
-    };
+    socket.on('start-transcription', () => {
+        console.log('Starting transcription for:', socket.id);
+        
+        // Initialize the Deepgram SDK with the new API key
+        const deepgram = createClient("6f530ff14289d5c371aa80fa4f9550ed9150ebc8");
 
-    // Create a recognize stream
-    recognizeStream = speechClient
-      .streamingRecognize(request)
-      .on('error', (error) => {
-        console.error('Speech recognition error:', error);
-        socket.emit('error', error.message);
-        recognizeStream = null;
-      })
-      .on('data', (data) => {
-        if (data.results[0] && data.results[0].alternatives[0]) {
-          const transcript = data.results[0].alternatives[0].transcript;
-          const isFinal = data.results[0].isFinal;
-          
-          socket.emit('transcription', {
-            text: transcript,
-            isFinal: isFinal,
-          });
+        // Create a websocket connection to Deepgram
+        const connection = deepgram.listen.live({
+            punctuate: true,
+            model: 'nova-2',
+            language: 'es',
+            encoding: 'linear16',
+            sample_rate: 16000,
+            channels: 1,
+            interim_results: true,
+            smart_format: true
+        });
+
+        // Store the connection
+        deepgramConnections.set(socket.id, connection);
+
+        // Listen for the connection to open
+        connection.on(LiveTranscriptionEvents.Open, () => {
+            console.log('Deepgram connection opened for:', socket.id);
+        });
+
+        // Listen for any transcripts received from Deepgram
+        connection.on(LiveTranscriptionEvents.Transcript, (data) => {
+            console.log('Transcript received:', data);
+            if (data.channel && data.channel.alternatives && data.channel.alternatives[0]) {
+                const transcript = data.channel.alternatives[0].transcript;
+                if (transcript && transcript.trim() !== '') {
+                    socket.emit('transcript', {
+                        text: transcript,
+                        is_final: data.is_final || false
+                    });
+                }
+            }
+        });
+
+        // Listen for any metadata received from Deepgram
+        connection.on(LiveTranscriptionEvents.Metadata, (data) => {
+            console.log('Metadata received:', data);
+        });
+
+        // Listen for any errors
+        connection.on(LiveTranscriptionEvents.Error, (error) => {
+            console.error('Deepgram error:', error);
+        });
+
+        // Listen for the connection to close
+        connection.on(LiveTranscriptionEvents.Close, () => {
+            console.log('Deepgram connection closed for:', socket.id);
+        });
+    });
+
+    socket.on('audio-data', (audioData) => {
+        const connection = deepgramConnections.get(socket.id);
+        if (connection) {
+            try {
+                // Convert the audio data to Buffer if it's not already
+                const buffer = Buffer.isBuffer(audioData) ? audioData : Buffer.from(audioData);
+                console.log('Sending audio data to Deepgram, size:', buffer.length);
+                connection.send(buffer);
+            } catch (error) {
+                console.error('Error sending audio data:', error);
+            }
+        } else {
+            console.log('No Deepgram connection found for:', socket.id);
         }
-      })
-      .on('end', () => {
-        console.log('Recognition stream ended for:', socket.id);
-        recognizeStream = null;
-      });
-  });
+    });
 
-  socket.on('audio-data', (audioData) => {
-    if (recognizeStream && !recognizeStream.destroyed && recognizeStream.writable) {
-      try {
-        recognizeStream.write(Buffer.from(audioData));
-      } catch (error) {
-        console.error('Error writing audio data:', error.message);
-      }
-    }
-  });
+    socket.on('stop-transcription', () => {
+        console.log('Stopping transcription for:', socket.id);
+        const connection = deepgramConnections.get(socket.id);
+        if (connection) {
+            connection.finish();
+            deepgramConnections.delete(socket.id);
+        }
+    });
 
-  socket.on('stop-recording', () => {
-    console.log('Stopping transcription for:', socket.id);
-    if (recognizeStream && !recognizeStream.destroyed && recognizeStream.writable) {
-      try {
-        recognizeStream.end();
-      } catch (error) {
-        console.error('Error ending stream:', error.message);
-      }
-      recognizeStream = null;
-    }
-  });
-
-  socket.on('disconnect', () => {
-    console.log('Client disconnected:', socket.id);
-    if (recognizeStream && !recognizeStream.destroyed && recognizeStream.writable) {
-      try {
-        recognizeStream.end();
-      } catch (error) {
-        console.error('Error ending stream on disconnect:', error.message);
-      }
-      recognizeStream = null;
-    }
-  });
+    socket.on('disconnect', () => {
+        console.log('Client disconnected:', socket.id);
+        const connection = deepgramConnections.get(socket.id);
+        if (connection) {
+            connection.finish();
+            deepgramConnections.delete(socket.id);
+        }
+    });
 });
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
-  console.log(`🎤 Voice Transcription Server running on http://localhost:${PORT}`);
+    console.log(`🎤 Voice Transcription Server running on http://localhost:${PORT}`);
 }); 
