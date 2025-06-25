@@ -1301,6 +1301,10 @@
         let currentFontSize = 16; // Default font size in pixels
         const minFontSize = 12;
         const maxFontSize = 24;
+        
+        // Initialize display variables globally
+        let transcriptContainer = null;
+        let interimElement = null;
 
         // Network status functions
         function updateOnlineStatus() {
@@ -1336,6 +1340,28 @@
         // Check browser support
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
             showError('Your browser does not support audio transcription. Please use Chrome, Firefox, or Safari.');
+        } else {
+            // Check microphone permissions on load
+            if (navigator.permissions) {
+                navigator.permissions.query({ name: 'microphone' }).then(permissionStatus => {
+                    console.log('🎤 Initial microphone permission status:', permissionStatus.state);
+                    
+                    if (permissionStatus.state === 'denied') {
+                        console.warn('⚠️ Microphone access is currently denied');
+                    }
+                    
+                    // Listen for permission changes
+                    permissionStatus.addEventListener('change', () => {
+                        console.log('🔄 Microphone permission changed to:', permissionStatus.state);
+                        if (permissionStatus.state === 'denied' && isRecording) {
+                            stopRecording();
+                            showError('Microphone access was revoked. Recording stopped.');
+                        }
+                    });
+                }).catch(error => {
+                    console.log('Could not query microphone permissions:', error);
+                });
+            }
         }
 
         // Detect PWA mode and add identifier for server
@@ -1580,16 +1606,39 @@
                 return;
             }
             
+            // Check socket connection
+            if (!socket.connected) {
+                showError('Not connected to server. Please wait and try again.');
+                return;
+            }
+            
             try {
-                // Get microphone access
+                console.log('🎤 Requesting microphone access...');
+                
+                // Check if microphone permission is already granted
+                if (navigator.permissions) {
+                    const permissionStatus = await navigator.permissions.query({ name: 'microphone' });
+                    console.log('🔍 Microphone permission status:', permissionStatus.state);
+                    
+                    if (permissionStatus.state === 'denied') {
+                        showError('Microphone access is denied. Please enable microphone permissions in your browser settings and reload the page.');
+                        return;
+                    }
+                }
+                
+                // Get microphone access with more flexible constraints
                 const stream = await navigator.mediaDevices.getUserMedia({ 
                     audio: {
-                        sampleRate: 16000,
+                        sampleRate: { ideal: 16000, min: 8000, max: 48000 },
                         channelCount: 1,
                         echoCancellation: true,
-                        noiseSuppression: true
+                        noiseSuppression: true,
+                        autoGainControl: true
                     } 
                 });
+                
+                console.log('✅ Microphone access granted');
+                console.log('🎵 Audio track settings:', stream.getAudioTracks()[0].getSettings());
                 
                 // Start transcription on server with selected service and language
                 socket.emit('start-transcription', { 
@@ -1619,6 +1668,9 @@
                 source.connect(processor);
                 processor.connect(audioContext.destination);
                 
+                // Store stream reference for cleanup
+                window.currentStream = stream;
+                
                 isRecording = true;
                 recordIcon.innerHTML = 'pause';
                 
@@ -1626,15 +1678,41 @@
                 hideError();
                 
             } catch (error) {
-                console.error('Error starting transcription:', error);
-                showError('Could not access microphone. Please check permissions and try again.');
+                console.error('❌ Error starting transcription:', error);
+                
+                // Provide specific error messages based on error type
+                if (error.name === 'NotAllowedError') {
+                    showError('Microphone access denied. Please click the microphone icon in your browser\'s address bar and allow access, then try again.');
+                } else if (error.name === 'NotFoundError') {
+                    showError('No microphone found. Please connect a microphone and try again.');
+                } else if (error.name === 'NotReadableError') {
+                    showError('Microphone is being used by another application. Please close other apps using the microphone and try again.');
+                } else if (error.name === 'OverconstrainedError') {
+                    showError('Microphone doesn\'t support the required audio format. Please try a different microphone.');
+                } else if (error.name === 'SecurityError') {
+                    showError('Microphone access blocked due to security settings. Please use HTTPS or enable microphone access.');
+                } else {
+                    showError(`Microphone error: ${error.message || 'Please check your microphone settings and try again.'}`);
+                }
             }
         }
         
         function stopRecording() {
+            console.log('⏹️ Stopping recording...');
+            
+            // Clean up audio context
             if (audioContext) {
                 audioContext.close();
                 audioContext = null;
+            }
+            
+            // Clean up microphone stream
+            if (window.currentStream) {
+                window.currentStream.getTracks().forEach(track => {
+                    track.stop();
+                    console.log('🔇 Stopped audio track:', track.label);
+                });
+                window.currentStream = null;
             }
             
             // Stop transcription on server
@@ -1644,12 +1722,11 @@
             recordIcon.innerHTML = 'play_arrow';
             
             updateDisplay();
+            console.log('✅ Recording stopped successfully');
         }
         
 
 
-        let transcriptContainer = null;
-        let interimElement = null;
         
         function updateDisplay(interimText = '') {
             if (!finalTranscript && !interimText) {
