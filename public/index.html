@@ -616,6 +616,8 @@
             font-size: 0.875rem;
         }
 
+
+
         .empty-state {
             text-align: center;
             color: #6b7280;
@@ -941,6 +943,37 @@
         let audioContext;
         let currentService = 'google';
         let currentLanguage = 'es';
+        let isOnline = navigator.onLine;
+
+        // Network status functions
+        function updateOnlineStatus() {
+            const wasOnline = isOnline;
+            isOnline = navigator.onLine;
+            
+            if (!isOnline && wasOnline) {
+                // Just went offline
+                console.log('Connection lost');
+                
+                // Stop recording if active
+                if (isRecording) {
+                    stopRecording();
+                    showError('Connection lost. Recording stopped.');
+                }
+            } else if (isOnline && !wasOnline) {
+                // Just came back online
+                console.log('Connection restored');
+                hideError();
+                
+                // Reconnect socket if needed
+                if (socket && !socket.connected) {
+                    socket.connect();
+                }
+            }
+        }
+
+        // Listen for online/offline events
+        window.addEventListener('online', updateOnlineStatus);
+        window.addEventListener('offline', updateOnlineStatus);
 
         
         // Check browser support
@@ -953,6 +986,23 @@
         
         socket.on('connect', () => {
             console.log('Connected to server');
+            // Clear any connection error messages
+            hideError();
+        });
+
+        socket.on('disconnect', () => {
+            console.log('Disconnected from server');
+            if (isRecording) {
+                stopRecording();
+                showError('Connection to server lost. Recording stopped.');
+            }
+        });
+
+        socket.on('connect_error', () => {
+            console.log('Failed to connect to server');
+            if (navigator.onLine) {
+                showError('Cannot connect to transcription server. Please try again.');
+            }
         });
         
         socket.on('transcript', (data) => {
@@ -1119,6 +1169,12 @@
         }
 
         async function startRecording() {
+            // Check if online first
+            if (!navigator.onLine) {
+                showError('No internet connection. Cannot start transcription.');
+                return;
+            }
+            
             try {
                 // Get microphone access
                 const stream = await navigator.mediaDevices.getUserMedia({ 
@@ -1337,10 +1393,35 @@
                 navigator.serviceWorker.register('/sw.js')
                     .then((registration) => {
                         console.log('SW registered: ', registration);
+                        
+                        // Check for updates
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing;
+                            console.log('New service worker found, installing...');
+                            
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed') {
+                                    if (navigator.serviceWorker.controller) {
+                                        // New update available
+                                        console.log('New version available! Refreshing...');
+                                        window.location.reload();
+                                    } else {
+                                        // First time install
+                                        console.log('App is ready for offline use');
+                                    }
+                                }
+                            });
+                        });
                     })
                     .catch((registrationError) => {
                         console.log('SW registration failed: ', registrationError);
                     });
+                    
+                // Listen for controlling service worker changes
+                navigator.serviceWorker.addEventListener('controllerchange', () => {
+                    console.log('New service worker activated, reloading...');
+                    window.location.reload();
+                });
             });
         }
         
