@@ -436,21 +436,7 @@
 
 
 
-        .recording-indicator {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            width: 10px;
-            height: 10px;
-            background: #ff6666;
-            border-radius: 50%;
-            animation: recording-pulse 1s infinite;
-        }
 
-        @keyframes recording-pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.3; transform: scale(1.1); }
-        }
 
         .controls-section {
             display: flex;
@@ -890,7 +876,6 @@
                     </svg>
                 </button>
                 <button class="control-button record-button" id="recordBtn">
-                    <span class="recording-indicator" id="recordingIndicator" style="display: none;"></span>
                     <span id="recordIcon">▶</span>
                 </button>
                 <button class="control-text-button" id="tipsBtn">
@@ -944,7 +929,7 @@
         const currentServiceName = document.getElementById('currentServiceName');
         const transcriptionArea = document.getElementById('transcriptionArea');
         const errorDiv = document.getElementById('error');
-        const recordingIndicator = document.getElementById('recordingIndicator');
+
         const languageDropdownTrigger = document.getElementById('languageDropdownTrigger');
         const languageDropdownContent = document.getElementById('languageDropdownContent');
         const currentLanguageName = document.getElementById('currentLanguageName');
@@ -1175,7 +1160,6 @@
                 
                 isRecording = true;
                 recordIcon.textContent = '⏸';
-                recordingIndicator.style.display = 'block';
                 
                 updateDisplay();
                 hideError();
@@ -1197,7 +1181,6 @@
             
             isRecording = false;
             recordIcon.textContent = '▶';
-            recordingIndicator.style.display = 'none';
             
             updateDisplay();
         }
