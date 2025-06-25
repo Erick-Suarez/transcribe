@@ -296,6 +296,11 @@
             word-wrap: break-word;
             overflow-wrap: break-word;
             hyphens: auto;
+            contain: layout style paint; /* CSS containment for better performance */
+        }
+        
+        .transcript-container {
+            contain: layout style paint; /* CSS containment for better performance */
         }
 
         @keyframes fadeIn {
@@ -1149,6 +1154,9 @@
         
 
 
+        let transcriptContainer = null;
+        let interimElement = null;
+        
         function updateDisplay(interimText = '') {
             if (!finalTranscript && !interimText) {
                 // Show different states based on whether we're recording or not
@@ -1157,42 +1165,60 @@
                 } else {
                     transcriptionArea.innerHTML = '<div class="empty-state"><div class="empty-state-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><path d="M12 19v4"/><path d="M8 23h8"/></svg></div><div>Tap to start recording...</div></div>';
                 }
+                transcriptContainer = null;
+                interimElement = null;
                 return;
             }
 
-            // Use DocumentFragment for better performance and less DOM manipulation
-            const fragment = document.createDocumentFragment();
-            const container = document.createElement('div');
+            // Initialize container if needed
+            if (!transcriptContainer) {
+                transcriptionArea.innerHTML = '';
+                transcriptContainer = document.createElement('div');
+                transcriptContainer.className = 'transcript-container';
+                transcriptionArea.appendChild(transcriptContainer);
+            }
             
-            // Add final transcript lines
-            if (finalTranscript) {
-                const lines = finalTranscript.trim().split('\n').filter(line => line.trim());
+            // Handle final transcript updates (only rebuild when final transcript changes)
+            const lines = finalTranscript.trim().split('\n').filter(line => line.trim());
+            const currentLineCount = transcriptContainer.children.length - (interimElement ? 1 : 0);
+            
+            if (lines.length !== currentLineCount) {
+                // Remove interim element temporarily
+                if (interimElement) {
+                    interimElement.remove();
+                    interimElement = null;
+                }
+                
+                // Clear and rebuild final transcript lines
+                transcriptContainer.innerHTML = '';
                 lines.forEach(line => {
                     const lineDiv = document.createElement('div');
                     lineDiv.className = 'transcript-line';
                     lineDiv.textContent = line.trim();
-                    container.appendChild(lineDiv);
+                    transcriptContainer.appendChild(lineDiv);
                 });
             }
             
-            // Add interim text
+            // Handle interim text (update in place to prevent flicker)
             if (interimText) {
-                const interimDiv = document.createElement('div');
-                interimDiv.className = 'interim-text';
-                interimDiv.textContent = interimText;
-                container.appendChild(interimDiv);
+                if (!interimElement) {
+                    interimElement = document.createElement('div');
+                    interimElement.className = 'interim-text';
+                    transcriptContainer.appendChild(interimElement);
+                }
+                // Only update if text actually changed
+                if (interimElement.textContent !== interimText) {
+                    interimElement.textContent = interimText;
+                }
+            } else if (interimElement) {
+                interimElement.remove();
+                interimElement = null;
             }
             
-            // Store scroll position to maintain it during updates
+            // Smart scrolling
             const wasScrolledToBottom = transcriptionArea.scrollHeight - transcriptionArea.scrollTop <= transcriptionArea.clientHeight + 50;
-            
-            // Replace content more efficiently
-            transcriptionArea.innerHTML = '';
-            transcriptionArea.appendChild(container);
-            
-            // Auto-scroll to bottom only if user was already at bottom or new content added
             if (wasScrolledToBottom || interimText) {
-                smoothScrollToBottom();
+                requestAnimationFrame(() => smoothScrollToBottom());
             }
         }
         
@@ -1221,6 +1247,10 @@
 
         function clearConversation() {
             finalTranscript = '';
+            
+            // Reset DOM references
+            transcriptContainer = null;
+            interimElement = null;
             
             // Stop recording if active
             if (isRecording) {
