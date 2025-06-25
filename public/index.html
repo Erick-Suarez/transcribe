@@ -17,11 +17,11 @@
     <link rel="manifest" href="/manifest.json">
     
     <!-- Icons -->
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="192x192" href="/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="512x512" href="/apple-touch-icon.png">
-    <link rel="icon" type="image/svg+xml" href="/icon.svg">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=8">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=8">
+    <link rel="icon" type="image/png" sizes="192x192" href="/apple-touch-icon.png?v=8">
+    <link rel="icon" type="image/png" sizes="512x512" href="/apple-touch-icon.png?v=8">
+    <link rel="icon" type="image/svg+xml" href="/icon.svg?v=8">
     <style>
         * {
             margin: 0;
@@ -878,7 +878,11 @@
                     </svg>
                 </button>
                 <button class="control-button record-button" id="recordBtn">
-                    <span id="recordIcon">▶</span>
+                    <span id="recordIcon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M8 5v14l11-7z"/>
+                        </svg>
+                    </span>
                 </button>
                 <button class="control-text-button" id="tipsBtn">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1215,7 +1219,7 @@
                 processor.connect(audioContext.destination);
                 
                 isRecording = true;
-                recordIcon.textContent = '⏸';
+                recordIcon.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
                 
                 updateDisplay();
                 hideError();
@@ -1236,7 +1240,7 @@
             socket.emit('stop-transcription');
             
             isRecording = false;
-            recordIcon.textContent = '▶';
+            recordIcon.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
             
             updateDisplay();
         }
