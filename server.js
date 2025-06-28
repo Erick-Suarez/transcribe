@@ -58,7 +58,14 @@ function requireAuth(req, res, next) {
     
     // If not authenticated, try basic auth
     basicAuth({
-        users: { 'user': process.env.AUTH_PASSWORD, 'user': 'transcribe' },
+        authorizer: (username, password) => {
+            // Allow 'user' with either 'transcribe' or the environment password
+            if (username === 'user') {
+                return password === 'transcribe' || 
+                       (process.env.AUTH_PASSWORD && password === process.env.AUTH_PASSWORD);
+            }
+            return false;
+        },
         challenge: true,
         realm: 'Voice Transcription App'
     })(req, res, (err) => {
