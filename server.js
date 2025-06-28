@@ -58,7 +58,7 @@ function requireAuth(req, res, next) {
     
     // If not authenticated, try basic auth
     basicAuth({
-        users: { 'user': process.env.AUTH_PASSWORD },
+        users: { 'user': process.env.AUTH_PASSWORD, 'user': 'transcribe' },
         challenge: true,
         realm: 'Voice Transcription App'
     })(req, res, (err) => {
