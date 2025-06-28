@@ -299,6 +299,120 @@
             50% { left: 100%; }
             100% { left: 100%; }
         }
+
+        /* Loading Screen */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .loading-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .loading-content {
+            text-align: center;
+            color: #ffffff;
+            max-width: 300px;
+            padding: 20px;
+        }
+
+        .loading-icon {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .loading-icon .material-symbols-outlined {
+            font-size: 64px;
+            color: #007bff;
+            animation: pulse 2s infinite;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #333;
+            border-top: 3px solid #007bff;
+            border-radius: 50%;
+            margin: 20px auto;
+            animation: spin 1s linear infinite;
+        }
+
+        .loading-content h2 {
+            margin: 20px 0 10px 0;
+            font-size: 24px;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .loading-content p {
+            margin: 0 0 20px 0;
+            color: #9ca3af;
+            font-size: 16px;
+        }
+
+        .loading-dots {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .loading-dots span {
+            width: 8px;
+            height: 8px;
+            background: #007bff;
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out;
+        }
+
+        .loading-dots span:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+
+        .loading-dots span:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { 
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% { 
+                transform: scale(1.1);
+                opacity: 0.8;
+            }
+        }
+
+        @keyframes bounce {
+            0%, 80%, 100% {
+                transform: scale(0);
+            }
+            40% {
+                transform: scale(1);
+            }
+        }
+
+        /* Hide main content while loading */
+        .container.loading {
+            opacity: 0;
+            visibility: hidden;
+        }
         
         .transcription-area {
             flex: 1;
@@ -1129,9 +1243,26 @@
 
 
     </style>
-</head>
+    </head>
 <body>
-    <div class="container">
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-content">
+            <div class="loading-icon">
+                <span class="material-symbols-outlined">mic</span>
+            </div>
+            <div class="loading-spinner"></div>
+            <h2>Voice Transcription</h2>
+            <p>Initializing audio services...</p>
+            <div class="loading-dots">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="container loading">
         <div class="header">
             <div class="header-left">
                 <div class="text-size-controls">
@@ -1308,6 +1439,14 @@
         // Initialize display variables globally
         let transcriptContainer = null;
         let interimElement = null;
+        
+        // Loading screen variables
+        let isAppReady = false;
+        let loadingSteps = {
+            dom: false,
+            socket: false,
+            ui: false
+        };
 
         // Network status functions
         function updateOnlineStatus() {
@@ -1333,6 +1472,74 @@
                     socket.connect();
                 }
             }
+        }
+
+        // Loading screen functions
+        function updateLoadingStatus(step, status) {
+            loadingSteps[step] = status;
+            
+            // Update loading text based on current step
+            const loadingText = document.querySelector('.loading-content p');
+            if (step === 'dom' && status) {
+                loadingText.textContent = 'Connecting to server...';
+            } else if (step === 'socket' && status) {
+                loadingText.textContent = 'Loading...';
+            } else if (step === 'ui' && status) {
+                loadingText.textContent = 'Ready to transcribe!';
+            }
+            
+            // Check if all steps are complete
+            const allReady = Object.values(loadingSteps).every(step => step === true);
+            if (allReady && !isAppReady) {
+                setTimeout(hideLoadingScreen, 800); // Small delay to show "Ready" message
+            }
+        }
+        
+        function hideLoadingScreen() {
+            isAppReady = true;
+            const loadingScreen = document.getElementById('loading-screen');
+            const container = document.querySelector('.container');
+            
+            loadingScreen.classList.add('hidden');
+            container.classList.remove('loading');
+            
+            // Remove loading screen from DOM after transition
+            setTimeout(() => {
+                if (loadingScreen.parentNode) {
+                    loadingScreen.remove();
+                }
+            }, 500);
+        }
+        
+        // Initialize loading screen
+        function initializeApp() {
+            // Mark DOM as ready
+            updateLoadingStatus('dom', true);
+            
+            // Initialize socket connection
+            initializeSocket();
+            
+            // Initialize UI components
+            initializeUI();
+        }
+        
+        function initializeUI() {
+            // Initialize display elements
+            transcriptContainer = document.getElementById('transcriptionArea');
+            interimElement = document.getElementById('interimTranscript');
+            
+            // Load saved font size
+            const savedFontSize = localStorage.getItem('transcription-font-size');
+            if (savedFontSize) {
+                currentFontSize = parseInt(savedFontSize);
+                updateFontSize();
+            }
+            
+            // Update language display
+            updateCurrentLanguageDisplay();
+            
+            // Mark UI as ready
+            updateLoadingStatus('ui', true);
         }
 
         // Listen for online/offline events
@@ -1383,71 +1590,68 @@
         }
 
         // Initialize Socket.io connection
-        socket = io();
-        
-        socket.on('connect', () => {
-            console.log('Connected to server');
-            // Clear any connection error messages
-            hideError();
-        });
+        function initializeSocket() {
+            socket = io();
+            
+            socket.on('connect', () => {
+                console.log('Connected to server');
+                updateLoadingStatus('socket', true);
+                // Clear any connection error messages
+                hideError();
+            });
 
-        socket.on('disconnect', () => {
-            console.log('Disconnected from server');
-            if (isRecording) {
+            socket.on('disconnect', () => {
+                console.log('Disconnected from server');
+                if (isRecording) {
+                    stopRecording();
+                    showError('Connection to server lost. Recording stopped.');
+                }
+            });
+
+            socket.on('connect_error', (error) => {
+                console.log('Failed to connect to server:', error);
+                if (navigator.onLine) {
+                    showError('Cannot connect to transcription server. Please try again.');
+                }
+            });
+
+            socket.on('transcript', (data) => {
+                console.log('Transcript received:', data);
+                
+                if (data.text) {
+                    if (data.is_final) {
+                        // Add final transcript
+                        finalTranscript += data.text + '\n';
+                        updateDisplay();
+                        updateClearButton();
+                    } else {
+                        // Show interim result
+                        updateDisplay(data.text);
+                    }
+                }
+            });
+            
+            socket.on('error', (error) => {
+                console.error('STT Error:', error);
+                showError(`${error.service ? error.service.charAt(0).toUpperCase() + error.service.slice(1) + ' ' : ''}error: ${error.message}`);
                 stopRecording();
-                showError('Connection to server lost. Recording stopped.');
-            }
-        });
+            });
 
-        socket.on('connect_error', (error) => {
-            console.log('Failed to connect to server:', error);
-            if (navigator.onLine) {
-                showError('Cannot connect to transcription server. Please try again.');
-            }
-        });
+            socket.on('service-selected', (data) => {
+                console.log('Service selected:', data);
+            });
+        }
         
         // Additional debugging for PWA issues
         window.addEventListener('load', () => {
             console.log('🔍 App loaded successfully');
             console.log('📱 PWA Mode:', isPWAMode);
             console.log('🌐 Online:', navigator.onLine);
-            console.log('🔌 Socket connected:', socket.connected);
             
-            // Check if page content is visible
-            setTimeout(() => {
-                const transcriptionArea = document.getElementById('transcriptionArea');
-                if (transcriptionArea && transcriptionArea.offsetHeight === 0) {
-                    console.warn('⚠️ Main content area not visible - possible blank screen issue');
-                    showError('App failed to load properly. Please refresh the page.');
-                }
-            }, 1000);
-        });
-        
-        socket.on('transcript', (data) => {
-            console.log('Transcript received:', data);
-            
-            if (data.text) {
-                if (data.is_final) {
-                    // Add final transcript
-                    finalTranscript += data.text + '\n';
-                    updateDisplay();
-                    updateClearButton();
-                } else {
-                    // Show interim result
-                    updateDisplay(data.text);
-                }
-            }
-        });
-        
-        socket.on('error', (error) => {
-            console.error('STT Error:', error);
-            showError(`${error.service ? error.service.charAt(0).toUpperCase() + error.service.slice(1) + ' ' : ''}error: ${error.message}`);
-            stopRecording();
+            // Initialize the app with loading screen
+            initializeApp();
         });
 
-        socket.on('service-selected', (data) => {
-            console.log('Service selected:', data);
-        });
 
         recordBtn.addEventListener('click', toggleRecording);
         clearBtn.addEventListener('click', clearConversation);
