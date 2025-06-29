@@ -232,6 +232,18 @@ function getLanguageOptions(language) {
             language: 'en-US',
             // Google STT options
             languageCode: 'en-US'
+        },
+        'ko': {
+            // Deepgram options
+            language: 'ko',
+            // Google STT options
+            languageCode: 'ko-KR'
+        },
+        'zh': {
+            // Deepgram options (Mandarin Simplified)
+            language: 'zh-CN',
+            // Google STT options (Mandarin Simplified)
+            languageCode: 'cmn-Hans-CN'
         }
     };
     
