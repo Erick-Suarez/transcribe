@@ -244,6 +244,18 @@ function getLanguageOptions(language) {
             language: 'zh-CN',
             // Google STT options (Mandarin Simplified)
             languageCode: 'cmn-Hans-CN'
+        },
+        'zh-tw': {
+            // Deepgram options (not supported)
+            language: null,
+            // Google STT options (Mandarin Traditional)
+            languageCode: 'cmn-Hant-TW'
+        },
+        'tl': {
+            // Deepgram options (not supported)
+            language: null,
+            // Google STT options (Filipino/Tagalog)
+            languageCode: 'tl-PH'
         }
     };
     

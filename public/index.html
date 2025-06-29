@@ -562,6 +562,7 @@
 
         .language-dropdown-option.selected {
             background: #1f2937;
+            border-left: 3px solid #ffffff;
         }
 
         .language-option-name {
@@ -1289,6 +1290,12 @@
                             <div class="language-dropdown-option" data-value="zh">
                                 <div class="language-option-name">Chinese Simplified</div>
                             </div>
+                            <div class="language-dropdown-option" data-value="zh-tw">
+                                <div class="language-option-name">Chinese Traditional</div>
+                            </div>
+                            <div class="language-dropdown-option" data-value="tl">
+                                <div class="language-option-name">Tagalog</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1424,7 +1431,14 @@
         let audioContext;
         let currentService = 'google';
         let currentLanguage = 'es';
+        let pendingService = null; // Track the service selected in settings but not yet applied
         let isOnline = navigator.onLine;
+        
+        // Language compatibility data - hardcoded for performance
+        const languageCompatibility = {
+            deepgram: ['es', 'en', 'ko', 'zh'], // Languages supported by Deepgram
+            google: ['es', 'en', 'ko', 'zh', 'zh-tw', 'tl'] // Languages supported by Google STT
+        };
         let isRotated = false;
         let currentFontSize = 16; // Default font size in pixels
         const minFontSize = 12;
@@ -1470,7 +1484,9 @@
 
         // Loading screen functions
         function updateLoadingStatus(step, status) {
+            console.log(`📊 Loading step '${step}' set to:`, status);
             loadingSteps[step] = status;
+            console.log('📊 Current loading steps:', loadingSteps);
             
             // Update loading text based on current step
             const loadingText = document.querySelector('.loading-content p');
@@ -1484,7 +1500,9 @@
             
             // Check if all steps are complete
             const allReady = Object.values(loadingSteps).every(step => step === true);
+            console.log('📊 All steps ready?', allReady);
             if (allReady && !isAppReady) {
+                console.log('🎉 All loading steps complete, hiding loading screen...');
                 setTimeout(hideLoadingScreen, 800); // Small delay to show "Ready" message
             }
         }
@@ -1507,14 +1525,19 @@
         
         // Initialize loading screen
         function initializeApp() {
+            console.log('🚀 Initializing app...');
+            
             // Mark DOM as ready
             updateLoadingStatus('dom', true);
+            console.log('✅ DOM ready');
             
             // Initialize socket connection
             initializeSocket();
+            console.log('🔌 Socket initialization started');
             
             // Initialize UI components
             initializeUI();
+            console.log('🎨 UI initialization completed');
         }
         
         function initializeUI() {
@@ -1531,6 +1554,9 @@
             
             // Update language display
             updateCurrentLanguageDisplay();
+            
+            // Initialize language dropdown with hardcoded compatibility data
+            initializeLanguageDropdown();
             
             // Mark UI as ready
             updateLoadingStatus('ui', true);
@@ -1741,6 +1767,7 @@
             
             currentLanguage = newLanguage;
             updateCurrentLanguageDisplay();
+            updateLanguageDropdownSelection();
             console.log('Language changed to:', newLanguage);
         }
         
@@ -1759,42 +1786,16 @@
                     return { name: 'Korean' };
                 case 'zh': 
                     return { name: 'Chinese Simplified' };
+                case 'zh-tw': 
+                    return { name: 'Chinese Traditional' };
+                case 'tl': 
+                    return { name: 'Tagalog' };
                 default: 
                     return { name: language };
             }
         }
         
-        // Custom dropdown functionality - handle both click and touch
-        function handleDropdownTrigger(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            toggleDropdown();
-        }
-        
-        dropdownTrigger.addEventListener('click', handleDropdownTrigger);
-        dropdownTrigger.addEventListener('touchend', handleDropdownTrigger);
-        
-        // Close dropdown when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!document.getElementById('customDropdown').contains(e.target)) {
-                closeDropdown();
-            }
-        });
-        
-        // Handle option selection - both click and touch events
-        function handleDropdownSelection(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            const option = e.target.closest('.dropdown-option');
-            if (option) {
-                const value = option.dataset.value;
-                selectService(value);
-                closeDropdown();
-            }
-        }
-        
-        dropdownContent.addEventListener('click', handleDropdownSelection);
-        dropdownContent.addEventListener('touchend', handleDropdownSelection);
+
         
         function toggleRecording() {
             if (isRecording) {
@@ -2057,11 +2058,27 @@
         }
 
         function showSettings() {
+            // Reset pending service when opening settings
+            pendingService = null;
+            
+            // Make sure the current service is selected in the radio buttons
+            const radioButtons = document.querySelectorAll('input[name="model"]');
+            radioButtons.forEach(radio => {
+                radio.checked = (radio.value === currentService);
+            });
+            
             settingsModal.classList.add('show');
         }
         
         function hideSettings() {
             settingsModal.classList.remove('show');
+            
+            // Apply pending service selection if there is one
+            if (pendingService && pendingService !== currentService) {
+                console.log(`🔄 Applying pending service change: ${currentService} → ${pendingService}`);
+                selectService(pendingService);
+                pendingService = null;
+            }
         }
 
         // Settings functionality
@@ -2071,8 +2088,24 @@
             radioButtons.forEach(radio => {
                 radio.addEventListener('change', (e) => {
                     if (e.target.checked) {
-                        selectService(e.target.value);
-                        hideSettings();
+                        // Track pending service selection
+                        pendingService = e.target.value;
+                        // Update language dropdown immediately when model changes
+                        updateLanguageDropdownForService(e.target.value);
+                        updateLanguageDropdownSelection();
+                        console.log(`🎯 Model selection changed to: ${e.target.value}, updated language dropdown`);
+                    }
+                });
+                
+                // Also add click listener for immediate visual feedback
+                radio.addEventListener('click', (e) => {
+                    if (e.target.checked) {
+                        // Track pending service selection
+                        pendingService = e.target.value;
+                        // Update language dropdown immediately when model changes
+                        updateLanguageDropdownForService(e.target.value);
+                        updateLanguageDropdownSelection();
+                        console.log(`🎯 Model clicked: ${e.target.value}, updated language dropdown`);
                     }
                 });
             });
@@ -2084,8 +2117,12 @@
                     const radio = option.querySelector('input[type="radio"]');
                     if (radio && !radio.checked) {
                         radio.checked = true;
-                        selectService(radio.value);
-                        hideSettings();
+                        // Track pending service selection
+                        pendingService = radio.value;
+                        // Update language dropdown immediately when model changes
+                        updateLanguageDropdownForService(radio.value);
+                        updateLanguageDropdownSelection();
+                        console.log(`🎯 Settings option clicked: ${radio.value}, updated language dropdown`);
                     }
                 });
             });
@@ -2093,6 +2130,8 @@
 
         function selectService(newService) {
             if (newService === currentService) return;
+            
+            console.log(`🔄 Switching from ${currentService} to ${newService}`);
             
             // Stop current recording if active
             if (isRecording) {
@@ -2105,7 +2144,74 @@
             // Update current service
             currentService = newService;
             
-            console.log(`Switched STT service to: ${newService}`);
+            // Reset language to default (Spanish) when switching services
+            currentLanguage = 'es';
+            updateCurrentLanguageDisplay();
+            
+            // Update language dropdown to show only compatible languages
+            console.log('🌐 Updating language dropdown for service:', newService);
+            console.log('📋 Language compatibility data:', languageCompatibility);
+            updateLanguageDropdownForService(newService);
+            
+            // Update visual selection in dropdown
+            updateLanguageDropdownSelection();
+            
+            console.log(`✅ Switched STT service to: ${newService}, language reset to: ${currentLanguage}`);
+        }
+
+        // Initialize language dropdown
+        function initializeLanguageDropdown() {
+            console.log('Language compatibility loaded:', languageCompatibility);
+            
+            // Initialize dropdown with current service
+            updateLanguageDropdownForService(currentService);
+            updateLanguageDropdownSelection();
+        }
+
+        // Update language dropdown based on selected service
+        function updateLanguageDropdownForService(service) {
+            console.log(`🔍 updateLanguageDropdownForService called with service: ${service}`);
+            console.log(`🔍 languageCompatibility:`, languageCompatibility);
+            
+            if (!languageCompatibility) {
+                console.warn('⚠️ Language compatibility data not loaded yet');
+                return;
+            }
+            
+            const supportedLanguages = languageCompatibility[service] || [];
+            const allOptions = document.querySelectorAll('.language-dropdown-option');
+            
+            console.log(`🔍 Found ${allOptions.length} language options`);
+            console.log(`🔍 Supported languages for ${service}:`, supportedLanguages);
+            
+            allOptions.forEach(option => {
+                const languageCode = option.dataset.value;
+                const isSupported = supportedLanguages.includes(languageCode);
+                
+                if (isSupported) {
+                    option.style.display = 'block';
+                    console.log(`✅ Showing ${languageCode}`);
+                } else {
+                    option.style.display = 'none';
+                    console.log(`❌ Hiding ${languageCode}`);
+                }
+            });
+            
+            console.log(`✅ Updated language dropdown for ${service}:`, supportedLanguages);
+        }
+
+        // Update visual selection in language dropdown
+        function updateLanguageDropdownSelection() {
+            const allOptions = document.querySelectorAll('.language-dropdown-option');
+            
+            allOptions.forEach(option => {
+                const languageCode = option.dataset.value;
+                if (languageCode === currentLanguage) {
+                    option.classList.add('selected');
+                } else {
+                    option.classList.remove('selected');
+                }
+            });
         }
 
         function toggleScreenRotation() {

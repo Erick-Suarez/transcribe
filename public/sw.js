@@ -32,6 +32,12 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // Skip unsupported URL schemes (chrome-extension, moz-extension, etc.)
+  const url = new URL(event.request.url);
+  if (!url.protocol.startsWith('http')) {
+    return;
+  }
+
   // Skip Socket.IO and other dynamic requests
   if (event.request.url.includes('/socket.io/') || 
       event.request.url.includes('sockjs') ||
@@ -48,7 +54,13 @@ self.addEventListener('fetch', (event) => {
           const responseClone = response.clone();
           caches.open(CACHE_NAME)
             .then((cache) => {
-              cache.put(event.request, responseClone);
+              // Double-check URL scheme before caching
+              const requestUrl = new URL(event.request.url);
+              if (requestUrl.protocol.startsWith('http')) {
+                cache.put(event.request, responseClone).catch((error) => {
+                  console.warn('Failed to cache request:', event.request.url, error);
+                });
+              }
             });
         }
         return response;
