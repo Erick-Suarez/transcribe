@@ -13,6 +13,31 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Transcribe">
     
+    <!-- Google tag (gtag.js) - Only load in production -->
+    <script>
+      // Only load Google Analytics in production (not localhost)
+      if (window.location.hostname !== 'localhost' && 
+          window.location.hostname !== '127.0.0.1' && 
+          window.location.hostname !== '0.0.0.0') {
+        
+        // Load gtag script
+        var script = document.createElement('script');
+        script.async = true;
+        script.src = 'https://www.googletagmanager.com/gtag/js?id=G-YB2N8WG91R';
+        document.head.appendChild(script);
+        
+        // Initialize GA
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-YB2N8WG91R');
+        
+        console.log('📊 Google Analytics loaded');
+      } else {
+        console.log('🏠 Development mode - Google Analytics disabled');
+      }
+    </script>
+    
     <!-- PWA Manifest -->
     <link rel="manifest" href="/manifest.json">
     
