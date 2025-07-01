@@ -892,6 +892,16 @@
             transition: all 0.2s ease;
             min-width: 60px;
         }
+        
+        .header-right .control-text-button {
+            min-width: 48px;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+        }
 
         .control-text-button:hover {
             background: rgba(156, 163, 175, 0.2);
@@ -904,16 +914,7 @@
             font-size: 14px;
         }
 
-        #headerSignInBtn {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.2);
-            color: #ffffff;
-        }
 
-        #headerSignInBtn:hover {
-            background: rgba(255, 255, 255, 0.2);
-            border-color: rgba(255, 255, 255, 0.4);
-        }
 
         .control-button {
             width: 75px;
@@ -1898,7 +1899,6 @@
             <div class="header-right">
                 <button class="control-text-button" id="headerSignInBtn" style="display: none;">
                     <span class="material-symbols-outlined">login</span>
-                    <span class="sign-in-text">Sign In</span>
                 </button>
                 <button class="control-text-button" id="settingsBtn">
                     <span class="material-symbols-outlined">settings</span>
