@@ -12,7 +12,7 @@ steps:
     args:
     - 'run'
     - 'deploy'
-    - 'transcribe-app'
+    - 'transcribe'
     - '--image'
     - 'gcr.io/$PROJECT_ID/transcribe-app:$COMMIT_SHA'
     - '--region'
