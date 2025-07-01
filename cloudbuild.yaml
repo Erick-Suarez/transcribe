@@ -24,4 +24,7 @@ steps:
     - '8080'
 
 images:
-  - 'gcr.io/$PROJECT_ID/transcribe-app:$COMMIT_SHA' 
+  - 'gcr.io/$PROJECT_ID/transcribe-app:$COMMIT_SHA'
+
+options:
+  logging: CLOUD_LOGGING_ONLY 
