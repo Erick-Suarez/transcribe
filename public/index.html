@@ -2191,7 +2191,8 @@
         let loadingSteps = {
             dom: false,
             socket: false,
-            ui: false
+            ui: false,
+            auth: false
         };
 
         // Network status functions
@@ -2235,6 +2236,8 @@
             } else if (step === 'socket' && status) {
                 loadingText.textContent = 'Loading...';
             } else if (step === 'ui' && status) {
+                loadingText.textContent = 'Checking authentication...';
+            } else if (step === 'auth' && status) {
                 loadingText.textContent = 'Ready to transcribe!';
             }
             
@@ -2761,6 +2764,11 @@
                 console.log('🔄 Auth state changed:', user ? `authenticated as ${user.email}` : 'not authenticated');
                 currentUser = user;
                 
+                // Mark auth as complete (this is the first auth state change)
+                if (!loadingSteps.auth) {
+                    updateLoadingStatus('auth', true);
+                }
+                
                 if (user) {
                     // User is signed in
                     const email = user.email || user.displayName || 'Google User';
@@ -2820,6 +2828,8 @@
             });
             } catch (error) {
                 console.error('Failed to set up auth state listener:', error.message);
+                // Mark auth as complete even if it failed, so app doesn't get stuck
+                updateLoadingStatus('auth', true);
             }
         }
 
@@ -2949,7 +2959,17 @@
                 await handleAuthStateChange();
             } else {
                 console.error('Firebase Auth failed to initialize');
+                // Mark auth as complete so app doesn't get stuck
+                updateLoadingStatus('auth', true);
             }
+            
+            // Fallback timeout in case auth never completes
+            setTimeout(() => {
+                if (!loadingSteps.auth) {
+                    console.warn('Auth check timed out, proceeding anyway');
+                    updateLoadingStatus('auth', true);
+                }
+            }, 5000);
             
             // Update usage display on app load
             updateUsageDisplay();
